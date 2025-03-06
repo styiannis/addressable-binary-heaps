@@ -256,7 +256,7 @@ import {
   MinHeap,
 
   // Abstract Base Class
-  AbstractHeap
+  AbstractHeap,
 
   // Interfaces
   IHeapArray,
