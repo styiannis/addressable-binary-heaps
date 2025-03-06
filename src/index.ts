@@ -1,1 +1,2 @@
-export const hello = 'Hello from Index';
+export * from './core';
+export * from './types';
