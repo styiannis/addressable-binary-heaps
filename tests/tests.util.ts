@@ -1,4 +1,4 @@
-import { IHeapArray } from '../src';
+import { AbstractHeap, IHeapArray, MaxHeap, MinHeap } from '../src';
 
 /* ----------------------------------------- */
 /* ---------- // Helper functions ---------- */
@@ -12,7 +12,7 @@ function areIdenticalArrays(a: any[], b: any[]) {
 /* ---------- Helper functions // ---------- */
 /* ----------------------------------------- */
 
-export function heapKeys(heap: IHeapArray) {
+export function heapKeys(heap: IHeapArray | MaxHeap | MinHeap) {
   const keys: number[] = [];
   for (let node of heap) {
     keys.push(node.key);
@@ -42,6 +42,61 @@ export function isValidObjectInstance(
     return (
       Array.isArray(instance) &&
       areIdenticalArrays(props, ['indices', 'length'])
+    );
+  }
+
+  return false;
+}
+
+export function isValidClassInstance(
+  instance: unknown,
+  instanceType: 'MaxHeap' | 'MinHeap'
+) {
+  if ('object' !== typeof instance) {
+    return false;
+  }
+
+  // Own property names (sorted)
+  const props = Object.getOwnPropertyNames(instance).sort();
+
+  // Prototype property names (sorted)
+  const protoProps = Object.getOwnPropertyNames(
+    Object.getPrototypeOf(instance)
+  ).sort();
+
+  if (
+    !areIdenticalArrays(props, []) ||
+    !areIdenticalArrays(protoProps, [
+      'add',
+      'clear',
+      'constructor',
+      'decrease',
+      'entries',
+      'forEach',
+      'increase',
+      'keys',
+      'peek',
+      'pop',
+      'remove',
+      'size',
+    ]) ||
+    !(instance instanceof AbstractHeap) ||
+    Object.getPrototypeOf(instance) === AbstractHeap.prototype
+  ) {
+    return false;
+  }
+
+  if ('MaxHeap' === instanceType) {
+    return (
+      instance instanceof MaxHeap &&
+      Object.getPrototypeOf(instance) === MaxHeap.prototype
+    );
+  }
+
+  if ('MinHeap' === instanceType) {
+    return (
+      instance instanceof MinHeap &&
+      Object.getPrototypeOf(instance) === MinHeap.prototype
     );
   }
 
