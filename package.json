@@ -68,6 +68,26 @@
         "types": "./dist/@types/index.d.ts",
         "default": "./dist/cjs/index.js"
       }
+    },
+    "./max-heap": {
+      "import": {
+        "types": "./dist/@types/core/max-heap.d.ts",
+        "default": "./dist/es/core/max-heap.js"
+      },
+      "require": {
+        "types": "./dist/@types/core/max-heap.d.ts",
+        "default": "./dist/cjs/core/max-heap.js"
+      }
+    },
+    "./min-heap": {
+      "import": {
+        "types": "./dist/@types/core/min-heap.d.ts",
+        "default": "./dist/es/core/min-heap.js"
+      },
+      "require": {
+        "types": "./dist/@types/core/min-heap.d.ts",
+        "default": "./dist/cjs/core/min-heap.js"
+      }
     }
   }
 }
