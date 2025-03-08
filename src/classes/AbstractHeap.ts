@@ -48,7 +48,7 @@ export abstract class AbstractHeap<N extends IHeapNode = IHeapNode> {
   abstract entries(reversed: boolean): Generator<N, void, void>;
 
   /**
-   * Executes a provided function (`callbackFn`) once per element in the heap.
+   * Executes a provided function (`callback`) once per element in the heap.
    */
   abstract forEach(
     /**
@@ -56,9 +56,9 @@ export abstract class AbstractHeap<N extends IHeapNode = IHeapNode> {
      * @param index - The index of the current element being processed in the heap.
      * @param heapInstance - The heap instance being iterated.
      */
-    callbackFn: (node: N, index: number, heapInstance: typeof this) => void,
+    callback: (node: N, index: number, heapInstance: typeof this) => void,
     /**
-     * @param [thisArg] - A value to use as `this` when executing `callbackFn`.
+     * @param [thisArg] - A value to use as `this` when executing `callback`.
      */
     thisArg?: any
   ): void;

@@ -107,18 +107,15 @@ export class MaxHeap<N extends IHeapNode = IHeapNode> extends AbstractHeap<N> {
      * @param index - The index of the current element being processed in the heap.
      * @param heapInstance - The heap instance being iterated.
      */
-    callbackFn: (node: N, index: number, heapInstance: typeof this) => void,
+    callback: (node: N, index: number, heapInstance: typeof this) => void,
     /**
-     * @param [thisArg] - A value to use as `this` when executing `callbackFn`.
+     * @param [thisArg] - A value to use as `this` when executing `callback`.
      */
     thisArg?: any
   ) {
-    for (
-      let i = 0, iter = this.entries(), curr = iter.next();
-      !curr.done;
-      i++, curr = iter.next()
-    ) {
-      callbackFn.call(thisArg, curr.value, i, this);
+    let i = 0;
+    for (const node of this.entries()) {
+      callback.call(thisArg, node, i++, this);
     }
   }
 
