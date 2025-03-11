@@ -1,54 +1,65 @@
 import { IHeapNode } from '../types';
 
 /**
- * An abstract class representing a heap.
+ * An abstract base class for implementing heap data structures.
  *
- * @template N - The type of nodes in the heap.
+ * Provides a common interface for both min-heap and max-heap implementations.
+ *
+ * @template N - The type of nodes in the heap, must extend `IHeapNode`.
  */
 export abstract class AbstractHeap<N extends IHeapNode = IHeapNode> {
   /**
-   * Returns an iterator for traversing the heap.
+   * Returns the current number of elements in the heap.
    *
-   * @param reversed - If `true`, the iterator will traverse the heap in reverse order.
-   * @returns A generator that yields `N` type elements.
-   */
-  abstract [Symbol.iterator](reversed: boolean): Generator<N, void, void>;
-
-  /**
-   * Getter method that returns heap size.
+   * @returns The number of elements in the heap.
    */
   abstract get size(): number;
 
   /**
-   * Adds a node to the heap.
+   * Makes the `AbstractHeap` iterable.
    *
-   * @param node - The node to add.
+   * *Note*: The traversal follows the order of the underlying array, not the priority order.
+   *
+   * @param reversed - If `true`, the iterator will traverse the heap in reverse order.
+   * @returns An iterator yielding heap elements in the specified order.
+   */
+  abstract [Symbol.iterator](reversed: boolean): Generator<N, void, void>;
+
+  /**
+   * Adds a new node to the heap while maintaining the heap property.
+   *
+   * @param node - The node to add to the heap.
    */
   abstract add(node: N): void;
 
   /**
-   * Clears the heap by removing all elements.
+   * Removes all elements from the heap.
    */
   abstract clear(): void;
 
   /**
-   * Decreases the key value of a heap element.
+   * Decreases the key value of a heap element by a specified amount.
    *
-   * @param node - The element whose key value will be decreased.
-   * @param decreaseValue - The value of decrease.
-   * @returns `true` or `false` depending on the outcome of the decrease process.
+   * @param node - The element to modify.
+   * @param decreaseValue - Amount to decrease the key by.
+   * @returns `true` if element was found and modified, `false` otherwise.
    */
   abstract decrease(node: N, decreaseValue: N['key']): boolean;
 
   /**
-   * Returns an iterator for traversing the heap elements.
+   * Returns an iterator for traversing all elements in the heap.
    *
-   * @param reversed - If `true`, the iterator will traverse the heap in reverse order.
+   * *Note*: The traversal follows the order of the underlying array, not the priority order.
+   *
+   * @param [reversed=false] - If `true`, the iterator will traverse the heap in reverse order.
+   * @returns An iterator yielding heap elements in the specified order.
    */
   abstract entries(reversed: boolean): Generator<N, void, void>;
 
   /**
-   * Executes a provided function (`callback`) once per element in the heap.
+   * Executes a callback function for each element in the heap.
+   *
+   * *Note*: The traversal follows the order of the underlying array, not the priority order.
    */
   abstract forEach(
     /**
@@ -64,36 +75,46 @@ export abstract class AbstractHeap<N extends IHeapNode = IHeapNode> {
   ): void;
 
   /**
-   * Increases the key value of a heap element.
+   * Increases the key value of a heap element by a specified amount.
    *
-   * @param node - The element whose key value will be increased.
-   * @param increaseValue - The value of increase.
-   * @returns `true` or `false` depending on the outcome of the increase process.
+   * @param node - The element to modify.
+   * @param increaseValue - Amount to increase the key by.
+   * @returns `true` if element was found and modified, `false` otherwise.
    */
   abstract increase(node: N, increaseValue: N['key']): boolean;
 
   /**
-   * Returns an iterator for traversing the heap element keys.
+   * Returns an iterator for traversing just the key values in the heap.
+   *
+   * *Note*: The traversal follows the order of the underlying array, not the priority order.
    *
    * @param reversed - If `true`, the iterator will traverse the heap in reverse order.
    */
   abstract keys(reversed: boolean): Generator<N['key'], void, void>;
 
   /**
-   * Returns the top element of the heap, or `undefined` if the heap is empty.
+   * Returns the top element of the heap without removing it.
+   * - For min-heaps, returns the minimum element.
+   * - For max-heaps, returns the maximum element.
+   * 
+   @returns The top element or `undefined` if heap is empty.
    */
   abstract peek(): N | undefined;
 
   /**
-   * Removes and returns the top element of the heap, or returns `undefined` if the heap is empty.
+   * Removes and returns the top element of the heap.
+   * - For min-heaps, removes the minimum element.
+   * - For max-heaps, removes the maximum element.
+   *
+   * @returns The removed top element or `undefined` if heap is empty.
    */
   abstract pop(): N | undefined;
 
   /**
-   * Removes a node from the heap.
+   * Removes a specific element from anywhere in the heap.
    *
-   * @param node - The node to remove.
-   * @returns `true` or `false` depending on the outcome of the removal process.
+   * @param node - The element to remove.
+   * @returns `true` if element was found and removed, `false` if not found.
    */
   abstract remove(node: N): boolean;
 }
