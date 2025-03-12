@@ -1,6 +1,6 @@
 # Addressable Binary Heaps
 
-A TypeScript library for addressable binary heaps, offering efficient min-heap and max-heap implementations, supporting both object-oriented and functional programming paradigms.
+A versatile TypeScript library for addressable binary heaps, delivering optimized and scalable min-heap and max-heap implementations, seamlessly supporting both object-oriented and functional paradigms.
 
 ## Key Features
 

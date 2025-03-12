@@ -1,7 +1,7 @@
 {
   "name": "addressable-binary-heaps",
   "version": "1.0.0",
-  "description": "A TypeScript library for addressable binary heaps, offering efficient min-heap and max-heap implementations, supporting both object-oriented and functional programming paradigms.",
+  "description": "A versatile TypeScript library for addressable binary heaps, delivering optimized and scalable min-heap and max-heap implementations, seamlessly supporting both object-oriented and functional paradigms.",
   "keywords": [
     "data structures",
     "binary heap",
