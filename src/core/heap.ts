@@ -36,7 +36,7 @@ export function peek<H extends IHeapArray>(instance: H) {
 }
 
 /**
- * Generates an iterator that traverses the heap elements in array order.
+ * Generates an iterator that traverses the heap elements.
  *
  * *Note*: The traversal follows the order of the underlying array, not the priority order.
  *
