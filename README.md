@@ -1,6 +1,6 @@
 # Addressable Binary Heaps
 
-A TypeScript library for addressable binary heaps, offering efficient min-heap and max-heap implementations, supporting both object-oriented and functional programming paradigms.
+A versatile TypeScript library for addressable binary heaps, delivering optimized and scalable min-heap and max-heap implementations, seamlessly supporting both object-oriented and functional paradigms.
 
 ## Key Features
 
@@ -106,9 +106,8 @@ heap.forEach((elem) => {
 console.log(heap.increase(element_2, 5)); // true
 
 // Accessing heap elements with the "entries" iterator.
-const entries = heap.entries();
-for (let curr = entries.next(); !curr.done; curr = entries.next()) {
-  console.log(curr.value);
+for (const entry of heap.entries()) {
+  console.log(entry);
   /*
   { key: 7 }
   { key: 6 }
@@ -120,9 +119,8 @@ for (let curr = entries.next(); !curr.done; curr = entries.next()) {
 console.log(heap.decrease(element_2, 10)); // true
 
 // Accessing heap element keys with the "keys" iterator.
-const keys = heap.keys();
-for (let curr = keys.next(); !curr.done; curr = keys.next()) {
-  console.log(curr.value);
+for (const key of heap.keys()) {
+  console.log(key);
   /*
   6
   -3
@@ -198,9 +196,8 @@ heap.forEach((elem) => {
 console.log(maxHeap.increase(heap, element_2, 5)); // true
 
 // Accessing heap elements with the "entries" iterator.
-const entries = maxHeap.entries(heap);
-for (let curr = entries.next(); !curr.done; curr = entries.next()) {
-  console.log(curr.value);
+for (const entry of maxHeap.entries(heap)) {
+  console.log(entry);
   /*
   { key: 7 }
   { key: 6 }
@@ -212,9 +209,8 @@ for (let curr = entries.next(); !curr.done; curr = entries.next()) {
 console.log(maxHeap.decrease(heap, element_2, 10)); // true
 
 // Accessing heap element keys with the "keys" iterator.
-const keys = maxHeap.keys(heap);
-for (let curr = keys.next(); !curr.done; curr = keys.next()) {
-  console.log(curr.value);
+for (const key of maxHeap.keys(heap)) {
+  console.log(key);
   /*
   6
   -3

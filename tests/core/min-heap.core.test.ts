@@ -268,21 +268,13 @@ describe('core >> min-heap', () => {
       const heap = minHeap.create(initialValues.map((key) => ({ key })));
 
       const values: number[] = [];
-      for (
-        let iter = minHeap.entries(heap), curr = iter.next();
-        !curr.done;
-        curr = iter.next()
-      ) {
-        values.push(curr.value.key);
+      for (const entry of minHeap.entries(heap)) {
+        values.push(entry.key);
       }
 
       const valuesReversed: number[] = [];
-      for (
-        let iter = minHeap.entries(heap, true), curr = iter.next();
-        !curr.done;
-        curr = iter.next()
-      ) {
-        valuesReversed.push(curr.value.key);
+      for (const entry of minHeap.entries(heap, true)) {
+        valuesReversed.push(entry.key);
       }
 
       expect(values).toStrictEqual(expectedValues);
@@ -295,21 +287,13 @@ describe('core >> min-heap', () => {
       const heap = minHeap.create(initialValues.map((key) => ({ key })));
 
       const values: number[] = [];
-      for (
-        let iter = minHeap.keys(heap), curr = iter.next();
-        !curr.done;
-        curr = iter.next()
-      ) {
-        values.push(curr.value);
+      for (const key of minHeap.keys(heap)) {
+        values.push(key);
       }
 
       const valuesReversed: number[] = [];
-      for (
-        let iter = minHeap.keys(heap, true), curr = iter.next();
-        !curr.done;
-        curr = iter.next()
-      ) {
-        valuesReversed.push(curr.value);
+      for (const key of minHeap.keys(heap, true)) {
+        valuesReversed.push(key);
       }
 
       expect(values).toStrictEqual(expectedValues);

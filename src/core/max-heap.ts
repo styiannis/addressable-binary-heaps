@@ -12,11 +12,12 @@ import {
 /* ----------------------------------------- */
 
 /**
- * Rebalance the max-heap array by moving one of its elements down.
+ * Rebalances the max-heap by moving an element down to maintain heap property.
+ * Compares the element with its children and swaps with the larger child if necessary.
  *
- * @typeParam H - The type of max-heap.
- * @param instance - The max-heap instance.
- * @param index - The array index of heap element.
+ * @typeParam H - The type of max-heap array.
+ * @param instance - The max-heap instance  to rebalance.
+ * @param index - Starting index of the element to move down.
  */
 function heapifyDown<H extends IHeapArray>(instance: H, index: number) {
   let i = index;
@@ -39,11 +40,12 @@ function heapifyDown<H extends IHeapArray>(instance: H, index: number) {
 }
 
 /**
- * Rebalance the max-heap array by moving one of its elements up.
+ * Rebalances the max-heap by moving an element up to maintain heap property.
+ * Compares the element with its parent and swaps if the element is larger.
  *
- * @typeParam H - The type of max-heap.
- * @param instance - The max-heap instance.
- * @param index - The array index of heap element.
+ * @typeParam H - The type of max-heap array.
+ * @param instance - The max-heap instance to rebalance.
+ * @param index - Starting index of the element to move up.
  */
 function heapifyUp<H extends IHeapArray>(instance: H, index: number) {
   for (
@@ -60,10 +62,11 @@ function heapifyUp<H extends IHeapArray>(instance: H, index: number) {
 /* ----------------------------------------- */
 
 /**
- * Creates a new max-heap instance.
+ * Creates a new max-heap instance, optionally initialized with elements.
  *
- * @typeParam H - The type of max-heap.
- * @param [initialNodes] - Array of unsorted heap elements.
+ * @typeParam H - The type of max-heap array.
+ * @param [initialNodes] - Array of unsorted heap elements to initialize with.
+ * @returns A new max-heap instance.
  */
 export function create<H extends IHeapArray>(
   initialNodes?: H[0][] | Readonly<H[0][]>
@@ -75,31 +78,33 @@ export function create<H extends IHeapArray>(
 }
 
 /**
- * Clears a max-heap instance.
+ * Clears a max-heap instance by removing all elements and their index mappings.
  *
- * @typeParam H - The type of max-heap.
- * @param instance - The max-heap instance.
+ * @typeParam H - The type of max-heap array.
+ * @param instance - The max-heap instance to clear.
  */
 export function clear<H extends IHeapArray>(instance: H) {
   return heap.clear(instance);
 }
 
 /**
- * Returns the size of max-heap.
+ * Returns the current number of elements in the max-heap.
  *
- * @typeParam H - The type of max-heap.
+ * @typeParam H - The type of max-heap array.
  * @param instance - The max-heap instance.
+ * @returns The number of elements in the heap.
  */
 export function size<H extends IHeapArray>(instance: H) {
   return heap.size(instance);
 }
 
 /**
- * Adds an element to the max-heap.
+ * Adds a new element to the max-heap while maintaining the heap property.
+ * The element is initially added at the end and then bubbled up as needed.
  *
- * @typeParam H - The type of max-heap.
+ * @typeParam H - The type of max-heap array.
  * @param instance - The max-heap instance.
- * @param node - The element to add.
+ * @param node - The new element to add.
  */
 export function add<H extends IHeapArray>(instance: H, node: H[0]) {
   instance.indices.set(node, instance.length);
@@ -108,22 +113,23 @@ export function add<H extends IHeapArray>(instance: H, node: H[0]) {
 }
 
 /**
- * Returns the top element of the max-heap.
+ * Returns the maximum element (root) of the max-heap without removing it.
  *
- * @typeParam H - The type of max-heap.
+ * @typeParam H - The type of max-heap array.
  * @param instance - The max-heap instance.
- * @returns The top element or `undefined` if the heap is empty.
+ * @returns The maximum element or `undefined` if heap is empty.
  */
 export function peek<H extends IHeapArray>(instance: H) {
   return heap.peek(instance);
 }
 
 /**
- * Removes and returns the top element of the max-heap.
+ * Removes and returns the maximum element (root) from the heap.
+ * Replaces root with last element and restores heap property.
  *
- * @typeParam H - The type of max-heap.
+ * @typeParam H - The type of max-heap array.
  * @param instance - The max-heap instance.
- * @returns The removed element or `undefined` if the heap is empty.
+ * @returns The maximum element or `undefined` if heap is empty.
  */
 export function pop<H extends IHeapArray>(instance: H) {
   if (0 === instance.length) {
@@ -148,12 +154,13 @@ export function pop<H extends IHeapArray>(instance: H) {
 }
 
 /**
- * Removes an element from the max-heap.
+ * Removes a specific element from anywhere in the heap.
+ * Maintains heap property after removal.
  *
- * @typeParam H - The type of max-heap.
+ * @typeParam H - The type of max-heap array.
  * @param instance - The max-heap instance.
  * @param node - The element to remove.
- * @returns `true` or `false` depending on the outcome of the removal process.
+ * @returns `true` if element was found and removed, `false` otherwise.
  */
 export function remove<H extends IHeapArray>(instance: H, node: H[0]) {
   if (0 === instance.length) {
@@ -189,13 +196,14 @@ export function remove<H extends IHeapArray>(instance: H, node: H[0]) {
 }
 
 /**
- * Increases the key value of a max-heap element.
+ * Increases the key value of a heap element by a specified amount.
+ * After increase, element may need to bubble up to maintain heap property.
  *
- * @typeParam H - The type of max-heap.
+ * @typeParam H - The type of max-heap array.
  * @param instance - The max-heap instance.
- * @param node - The element whose key value will be increased.
- * @param increaseValue - The value of increase.
- * @returns `true` or `false` depending on the outcome of the increase process.
+ * @param node - The element to modify.
+ * @param increaseValue - Amount to increase the key by.
+ * @returns `true` if element was found and modified, `false` otherwise.
  */
 export function increase<H extends IHeapArray>(
   instance: H,
@@ -215,13 +223,14 @@ export function increase<H extends IHeapArray>(
 }
 
 /**
- * Decreases the key value of a max-heap element.
+ * Decreases the key value of a heap element by a specified amount.
+ * After decrease, element may need to sink down to maintain heap property.
  *
- * @typeParam H - The type of max-heap.
+ * @typeParam H - The type of max-heap array.
  * @param instance - The max-heap instance.
- * @param node - The element whose key value will be decreased.
- * @param dencreaseValue - The value of decrease.
- * @returns `true` or `false` depending on the outcome of the decrease process.
+ * @param node - The element to modify.
+ * @param dencreaseValue - Amount to decrease the key by.
+ * @returns `true` if element was found and modified, `false` otherwise.
  */
 export function decrease<H extends IHeapArray>(
   instance: H,
@@ -241,24 +250,28 @@ export function decrease<H extends IHeapArray>(
 }
 
 /**
- * Returns an iterator for traversing the max-heap elements.
+ * Returns an iterator for traversing all elements in the max-heap.
  *
- * @typeParam H - The type of max-heap.
+ * *Note*: The traversal follows the order of the underlying array, not the priority order.
+ *
+ * @typeParam H - The type of max-heap array.
  * @param instance - The max-heap instance.
- * @param [reversed=false] - If `true`, the iterator will traverse the max-heap in reverse order.
- * @returns A generator that yields max-heap elements in the provided order.
+ * @param [reversed=false] - If `true`, the iterator will traverse the heap in reverse order.
+ * @returns An iterator yielding heap elements in the specified order.
  */
 export function entries<H extends IHeapArray>(instance: H, reversed = false) {
   return heap.entries(instance, reversed);
 }
 
 /**
- * Returns an iterator for traversing the max-heap element keys.
+ * Returns an iterator for traversing just the key values in the max-heap.
  *
- * @typeParam H - The type of max-heap.
+ * *Note*: The traversal follows the order of the underlying array, not the priority order.
+ *
+ * @typeParam H - The type of max-heap array.
  * @param instance - The max-heap instance.
- * @param [reversed=false] - If `true`, the iterator will traverse the max-heap in reverse order.
- * @returns A generator that yields max-heap element keys in the provided order.
+ * @param [reversed=false] - If `true`, the iterator will traverse the heap in reverse order.
+ * @returns An iterator yielding heap element keys in the specified order.
  */
 export function keys<H extends IHeapArray>(instance: H, reversed = false) {
   return heap.keys(instance, reversed);

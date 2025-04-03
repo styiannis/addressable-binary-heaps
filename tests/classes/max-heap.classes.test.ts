@@ -250,21 +250,13 @@ describe('classes >> max-heap', () => {
       const heap = new MaxHeap(initialValues.map((key) => ({ key })));
 
       const values: number[] = [];
-      for (
-        let iter = heap.entries(), curr = iter.next();
-        !curr.done;
-        curr = iter.next()
-      ) {
-        values.push(curr.value.key);
+      for (const entry of heap.entries()) {
+        values.push(entry.key);
       }
 
       const valuesReversed: number[] = [];
-      for (
-        let iter = heap.entries(true), curr = iter.next();
-        !curr.done;
-        curr = iter.next()
-      ) {
-        valuesReversed.push(curr.value.key);
+      for (const entry of heap.entries(true)) {
+        valuesReversed.push(entry.key);
       }
 
       expect(values).toStrictEqual(expectedValues);
@@ -277,21 +269,13 @@ describe('classes >> max-heap', () => {
       const heap = new MaxHeap(initialValues.map((key) => ({ key })));
 
       const values: number[] = [];
-      for (
-        let iter = heap.keys(), curr = iter.next();
-        !curr.done;
-        curr = iter.next()
-      ) {
-        values.push(curr.value);
+      for (const key of heap.keys()) {
+        values.push(key);
       }
 
       const valuesReversed: number[] = [];
-      for (
-        let iter = heap.keys(true), curr = iter.next();
-        !curr.done;
-        curr = iter.next()
-      ) {
-        valuesReversed.push(curr.value);
+      for (const key of heap.keys(true)) {
+        valuesReversed.push(key);
       }
 
       expect(values).toStrictEqual(expectedValues);
