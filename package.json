@@ -1,6 +1,6 @@
 {
   "name": "addressable-binary-heaps",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A versatile TypeScript library for addressable binary heaps, delivering optimized and scalable min-heap and max-heap implementations, seamlessly supporting both object-oriented and functional paradigms.",
   "keywords": [
     "data structures",
@@ -58,15 +58,15 @@
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-typescript": "^12.1.2",
-    "@tsconfig/node22": "^22.0.1",
+    "@tsconfig/node22": "^22.0.2",
     "@types/jest": "^29.5.14",
-    "@types/node": "^22.14.0",
+    "@types/node": "^22.15.21",
     "jest": "^29.7.0",
-    "rollup": "^4.39.0",
+    "rollup": "^4.41.1",
     "rollup-plugin-dts": "^6.2.1",
-    "ts-jest": "^29.3.1",
+    "ts-jest": "^29.3.4",
     "tslib": "^2.8.1",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.3"
   },
   "exports": {
     ".": {
