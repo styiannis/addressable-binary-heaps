@@ -10,13 +10,10 @@ import {
 /* ----------------------------------------- */
 
 function heapKeys(heap: IHeapArray) {
-  const ret: number[] = [];
-
-  for (let i = 0; i < heap.length; i++) {
-    ret.push(heap[i].key);
-  }
-
-  return ret;
+  return heap.reduce((acc, { key }) => {
+    acc.push(key);
+    return acc;
+  }, [] as number[]);
 }
 
 function isValidMaxHeap<A extends IHeapArray>(instance: A) {
