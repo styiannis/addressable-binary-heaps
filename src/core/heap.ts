@@ -47,13 +47,14 @@ export function peek<H extends IHeapArray>(instance: H) {
  */
 export function* entries<H extends IHeapArray>(instance: H, reversed: boolean) {
   if (reversed) {
-    for (let i = instance.length - 1; i >= 0; i--) {
+    for (let i = instance.length - 1; i >= 0; i -= 1) {
       yield instance[i] as H[0];
     }
-  } else {
-    for (let i = 0; i < instance.length; i++) {
-      yield instance[i] as H[0];
-    }
+    return;
+  }
+
+  for (const node of instance) {
+    yield node as H[0];
   }
 }
 
@@ -69,12 +70,13 @@ export function* entries<H extends IHeapArray>(instance: H, reversed: boolean) {
  */
 export function* keys<H extends IHeapArray>(instance: H, reversed: boolean) {
   if (reversed) {
-    for (let i = instance.length - 1; i >= 0; i--) {
+    for (let i = instance.length - 1; i >= 0; i -= 1) {
       yield instance[i].key;
     }
-  } else {
-    for (let i = 0; i < instance.length; i++) {
-      yield instance[i].key;
-    }
+    return;
+  }
+
+  for (const { key } of instance) {
+    yield key;
   }
 }
