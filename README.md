@@ -273,7 +273,7 @@ This approach is convenient when you need a broad range of functionalities from 
 
 For maximum control and minimal footprint, import individual functions or operations.
 
-#### For Max Heap:
+#### For Max Heap
 
 ```typescript
 import {
@@ -291,7 +291,7 @@ import {
 } from 'addressable-binary-heaps/max-heap';
 ```
 
-#### For Min Heap:
+#### For Min Heap
 
 ```typescript
 import {
