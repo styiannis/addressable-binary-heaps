@@ -1,16 +1,4 @@
-import {
-  add,
-  clear,
-  create,
-  decrease,
-  entries,
-  increase,
-  keys,
-  peek,
-  pop,
-  remove,
-  size,
-} from '../core/min-heap';
+import { minHeap } from '../core';
 import { IHeapArray, IHeapNode } from '../types';
 import { AbstractHeap } from './AbstractHeap';
 
@@ -33,7 +21,7 @@ export class MinHeap<N extends IHeapNode = IHeapNode> extends AbstractHeap<N> {
    */
   constructor(initialNodes?: N[] | Readonly<N[]>) {
     super();
-    this.#heap = create(initialNodes);
+    this.#heap = minHeap.create(initialNodes);
   }
 
   /**
@@ -42,7 +30,7 @@ export class MinHeap<N extends IHeapNode = IHeapNode> extends AbstractHeap<N> {
    * @returns The number of elements in the heap.
    */
   get size() {
-    return size(this.#heap);
+    return minHeap.size(this.#heap);
   }
 
   /**
@@ -54,7 +42,7 @@ export class MinHeap<N extends IHeapNode = IHeapNode> extends AbstractHeap<N> {
    * @returns An iterator yielding heap elements in the specified order.
    */
   [Symbol.iterator](reversed = false) {
-    return entries(this.#heap, reversed);
+    return minHeap.entries(this.#heap, reversed);
   }
 
   /**
@@ -63,14 +51,14 @@ export class MinHeap<N extends IHeapNode = IHeapNode> extends AbstractHeap<N> {
    * @param node - The element to add to the heap.
    */
   add(node: N) {
-    return add(this.#heap, node);
+    return minHeap.add(this.#heap, node);
   }
 
   /**
    * Clears the heap by removing all elements.
    */
   clear() {
-    return clear(this.#heap);
+    return minHeap.clear(this.#heap);
   }
 
   /**
@@ -81,7 +69,7 @@ export class MinHeap<N extends IHeapNode = IHeapNode> extends AbstractHeap<N> {
    * @returns `true` if element was found and modified, `false` otherwise.
    */
   decrease(node: N, decreaseValue: number) {
-    return decrease(this.#heap, node, decreaseValue);
+    return minHeap.decrease(this.#heap, node, decreaseValue);
   }
 
   /**
@@ -93,7 +81,7 @@ export class MinHeap<N extends IHeapNode = IHeapNode> extends AbstractHeap<N> {
    * @returns An iterator yielding heap elements in the specified order.
    */
   entries(reversed = false) {
-    return entries(this.#heap, reversed);
+    return minHeap.entries(this.#heap, reversed);
   }
 
   /**
@@ -125,7 +113,7 @@ export class MinHeap<N extends IHeapNode = IHeapNode> extends AbstractHeap<N> {
    * @returns `true` if element was found and modified, `false` otherwise.
    */
   increase(node: N, increaseValue: number) {
-    return increase(this.#heap, node, increaseValue);
+    return minHeap.increase(this.#heap, node, increaseValue);
   }
 
   /**
@@ -137,7 +125,7 @@ export class MinHeap<N extends IHeapNode = IHeapNode> extends AbstractHeap<N> {
    * @returns An iterator yielding heap element keys in the specified order.
    */
   keys(reversed = false) {
-    return keys(this.#heap, reversed);
+    return minHeap.keys(this.#heap, reversed);
   }
 
   /**
@@ -146,7 +134,7 @@ export class MinHeap<N extends IHeapNode = IHeapNode> extends AbstractHeap<N> {
    * @returns The minimum element or `undefined` if the heap is empty.
    */
   peek() {
-    return peek(this.#heap);
+    return minHeap.peek(this.#heap);
   }
 
   /**
@@ -155,7 +143,7 @@ export class MinHeap<N extends IHeapNode = IHeapNode> extends AbstractHeap<N> {
    * @returns The minimum element or `undefined` if the heap is empty.
    */
   pop() {
-    return pop(this.#heap);
+    return minHeap.pop(this.#heap);
   }
 
   /**
@@ -165,6 +153,6 @@ export class MinHeap<N extends IHeapNode = IHeapNode> extends AbstractHeap<N> {
    * @returns `true` if element was found and removed, `false` otherwise.
    */
   remove(node: N) {
-    return remove(this.#heap, node);
+    return minHeap.remove(this.#heap, node);
   }
 }
