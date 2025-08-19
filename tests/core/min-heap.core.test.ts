@@ -135,7 +135,7 @@ describe('core >> min-heap', () => {
     let i = 0;
     heap.forEach((node) => {
       expect(node.key).toStrictEqual(expectedOnInit[i]);
-      i++;
+      i += 1;
     });
 
     const removeNodesValues = [
@@ -177,7 +177,7 @@ describe('core >> min-heap', () => {
     let i = 0;
     heap.forEach((node) => {
       expect(node.key).toStrictEqual(expectedOnInit[i]);
-      i++;
+      i += 1;
     });
 
     const increaseNodesValues: [(typeof nodes)[0], number][] = [
@@ -223,7 +223,7 @@ describe('core >> min-heap', () => {
     let i = 0;
     heap.forEach((node) => {
       expect(node.key).toStrictEqual(expectedOnInit[i]);
-      i++;
+      i += 1;
     });
 
     const decreaseNodesValues: [(typeof nodes)[0], number][] = [
