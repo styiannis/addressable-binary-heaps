@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: deploy-code-documentation'
+  group: deploy-code-documentation
   cancel-in-progress: false
 
 jobs:
