@@ -1,4 +1,5 @@
 import { maxHeap, minHeap } from '../../src';
+import { TESTS_DATA } from '../tests.data';
 import { isValidObjectInstance } from '../tests.util';
 import {
   addAndValidate,
@@ -11,58 +12,8 @@ import {
 
 describe('Core', () => {
   it.each([
-    [
-      'max-heap' as const,
-      maxHeap,
-      {
-        addValues: [10, 15, 30, 40, 50, 100, 40],
-        removeValues: [100, 50, 40, 40, 30, 15, 10],
-        expectedAfterAdditions: [
-          [10],
-          [15, 10],
-          [30, 10, 15],
-          [40, 30, 15, 10],
-          [50, 40, 15, 10, 30],
-          [100, 40, 50, 10, 30, 15],
-          [100, 40, 50, 10, 30, 15, 40],
-        ],
-        expectedAfterRemovals: [
-          [50, 40, 40, 10, 30, 15],
-          [40, 30, 40, 10, 15],
-          [40, 30, 15, 10],
-          [30, 10, 15],
-          [15, 10],
-          [10],
-          [],
-        ],
-      },
-    ],
-    [
-      'min-heap' as const,
-      minHeap,
-      {
-        addValues: [10, 15, 30, 40, 50, 100, 40],
-        removeValues: [10, 15, 30, 40, 40, 50, 100],
-        expectedAfterAdditions: [
-          [10],
-          [10, 15],
-          [10, 15, 30],
-          [10, 15, 30, 40],
-          [10, 15, 30, 40, 50],
-          [10, 15, 30, 40, 50, 100],
-          [10, 15, 30, 40, 50, 100, 40],
-        ],
-        expectedAfterRemovals: [
-          [15, 40, 30, 40, 50, 100],
-          [30, 40, 100, 40, 50],
-          [40, 40, 100, 50],
-          [40, 50, 100],
-          [50, 100],
-          [100],
-          [],
-        ],
-      },
-    ],
+    ['max-heap' as const, maxHeap, TESTS_DATA.createAddPeekPop_1.maxHeap],
+    ['min-heap' as const, minHeap, TESTS_DATA.createAddPeekPop_1.minHeap],
   ])(
     '[%s] Create, add, peek, and pop (1)',
     (
@@ -90,58 +41,8 @@ describe('Core', () => {
   );
 
   it.each([
-    [
-      'max-heap' as const,
-      maxHeap,
-      {
-        addValues: [40, 100, 50, 40, 30, 15, 10],
-        removeValues: [100, 50, 40, 40, 30, 15, 10],
-        expectedAfterAdditions: [
-          [40],
-          [100, 40],
-          [100, 40, 50],
-          [100, 40, 50, 40],
-          [100, 40, 50, 40, 30],
-          [100, 40, 50, 40, 30, 15],
-          [100, 40, 50, 40, 30, 15, 10],
-        ],
-        expectedAfterRemovals: [
-          [50, 40, 15, 40, 30, 10],
-          [40, 40, 15, 10, 30],
-          [40, 30, 15, 10],
-          [30, 10, 15],
-          [15, 10],
-          [10],
-          [],
-        ],
-      },
-    ],
-    [
-      'min-heap' as const,
-      minHeap,
-      {
-        addValues: [40, 100, 50, 40, 30, 15, 10],
-        removeValues: [10, 15, 30, 40, 40, 50, 100],
-        expectedAfterAdditions: [
-          [40],
-          [40, 100],
-          [40, 100, 50],
-          [40, 40, 50, 100],
-          [30, 40, 50, 100, 40],
-          [15, 40, 30, 100, 40, 50],
-          [10, 40, 15, 100, 40, 50, 30],
-        ],
-        expectedAfterRemovals: [
-          [15, 40, 30, 100, 40, 50],
-          [30, 40, 50, 100, 40],
-          [40, 40, 50, 100],
-          [40, 100, 50],
-          [50, 100],
-          [100],
-          [],
-        ],
-      },
-    ],
+    ['max-heap' as const, maxHeap, TESTS_DATA.createAddPeekPop_2.maxHeap],
+    ['min-heap' as const, minHeap, TESTS_DATA.createAddPeekPop_2.minHeap],
   ])(
     '[%s] Create, add, peek, and pop (2)',
     (
@@ -169,38 +70,8 @@ describe('Core', () => {
   );
 
   it.each([
-    [
-      'max-heap' as const,
-      maxHeap,
-      {
-        addValues: [40, 100, 50, 40, 30, 15, 10],
-        expectedAfterAdditions: [
-          [40],
-          [100, 40],
-          [100, 40, 50],
-          [100, 40, 50, 40],
-          [100, 40, 50, 40, 30],
-          [100, 40, 50, 40, 30, 15],
-          [100, 40, 50, 40, 30, 15, 10],
-        ],
-      },
-    ],
-    [
-      'min-heap' as const,
-      minHeap,
-      {
-        addValues: [40, 100, 50, 40, 30, 15, 10],
-        expectedAfterAdditions: [
-          [40],
-          [40, 100],
-          [40, 100, 50],
-          [40, 40, 50, 100],
-          [30, 40, 50, 100, 40],
-          [15, 40, 30, 100, 40, 50],
-          [10, 40, 15, 100, 40, 50, 30],
-        ],
-      },
-    ],
+    ['max-heap' as const, maxHeap, TESTS_DATA.createAddClear.maxHeap],
+    ['min-heap' as const, minHeap, TESTS_DATA.createAddClear.minHeap],
   ])(
     '[%s] Create, add and clear',
     (instanceType, heap, { addValues, expectedAfterAdditions }) => {
@@ -222,40 +93,8 @@ describe('Core', () => {
   );
 
   it.each([
-    [
-      'max-heap' as const,
-      maxHeap,
-      {
-        values: [4, 7, 6, 1, 9, 3],
-        expectedInitial: [9, 7, 6, 1, 4, 3],
-        removeNodesIndices: [1, 2, 0, 4, 3, 5],
-        expectedAfterRemovals: [
-          [9, 4, 6, 1, 3],
-          [9, 4, 3, 1],
-          [9, 1, 3],
-          [3, 1],
-          [3],
-          [],
-        ],
-      },
-    ],
-    [
-      'min-heap' as const,
-      minHeap,
-      {
-        values: [4, 7, 6, 1, 9, 3],
-        expectedInitial: [1, 4, 3, 7, 9, 6],
-        removeNodesIndices: [0, 5, 2, 3, 4, 1],
-        expectedAfterRemovals: [
-          [1, 6, 3, 7, 9],
-          [1, 6, 9, 7],
-          [1, 7, 9],
-          [7, 9],
-          [7],
-          [],
-        ],
-      },
-    ],
+    ['max-heap' as const, maxHeap, TESTS_DATA.remove.maxHeap],
+    ['min-heap' as const, minHeap, TESTS_DATA.remove.minHeap],
   ])(
     '[%s] Remove',
     (
@@ -291,54 +130,8 @@ describe('Core', () => {
   );
 
   it.each([
-    [
-      'max-heap' as const,
-      maxHeap,
-      {
-        values: [4, 7, 6, 1, 9],
-        expectedValuesOrder: [9, 7, 6, 1, 4],
-        nodeIndexIncreaseValuePairs: [
-          [2, 0],
-          [0, 4],
-          [1, 3],
-          [3, 2],
-          [3, 7],
-          [2, 10],
-        ],
-        expectedAfterIncreases: [
-          [9, 7, 6, 1, 4],
-          [9, 8, 6, 1, 7],
-          [10, 9, 6, 1, 8],
-          [10, 9, 6, 3, 8],
-          [10, 10, 6, 9, 8],
-          [16, 10, 10, 9, 8],
-        ],
-      },
-    ],
-    [
-      'min-heap' as const,
-      minHeap,
-      {
-        values: [4, 7, 6, 1, 9],
-        expectedValuesOrder: [1, 4, 6, 7, 9],
-        nodeIndexIncreaseValuePairs: [
-          [2, 0],
-          [0, 4],
-          [1, 3],
-          [3, 2],
-          [3, 7],
-          [2, 10],
-        ],
-        expectedAfterIncreases: [
-          [1, 4, 6, 7, 9],
-          [1, 7, 6, 8, 9],
-          [1, 8, 6, 10, 9],
-          [3, 8, 6, 10, 9],
-          [6, 8, 10, 10, 9],
-          [8, 9, 10, 10, 16],
-        ],
-      },
-    ],
+    ['max-heap' as const, maxHeap, TESTS_DATA.increase.maxHeap],
+    ['min-heap' as const, minHeap, TESTS_DATA.increase.minHeap],
   ])(
     '[%s] Increase',
     (
@@ -375,54 +168,8 @@ describe('Core', () => {
   );
 
   it.each([
-    [
-      'max-heap' as const,
-      maxHeap,
-      {
-        values: [4, 7, 6, 1, 9],
-        expectedValuesOrder: [9, 7, 6, 1, 4],
-        nodeIndexDecreaseValuePairs: [
-          [2, 0],
-          [0, 4],
-          [1, 3],
-          [3, 2],
-          [3, 7],
-          [2, 10],
-        ],
-        expectedAfterDecreases: [
-          [9, 7, 6, 1, 4],
-          [9, 7, 6, 1, 0],
-          [9, 4, 6, 1, 0],
-          [9, 4, 6, -1, 0],
-          [9, 4, 6, -8, 0],
-          [9, 4, -4, -8, 0],
-        ],
-      },
-    ],
-    [
-      'min-heap' as const,
-      minHeap,
-      {
-        values: [4, 7, 6, 1, 9],
-        expectedValuesOrder: [1, 4, 6, 7, 9],
-        nodeIndexDecreaseValuePairs: [
-          [2, 0],
-          [0, 4],
-          [1, 3],
-          [3, 2],
-          [3, 7],
-          [2, 10],
-        ],
-        expectedAfterDecreases: [
-          [1, 4, 6, 7, 9],
-          [0, 1, 6, 7, 9],
-          [0, 1, 6, 4, 9],
-          [-1, 0, 6, 4, 9],
-          [-8, 0, 6, 4, 9],
-          [-8, 0, -4, 4, 9],
-        ],
-      },
-    ],
+    ['max-heap' as const, maxHeap, TESTS_DATA.decrease.maxHeap],
+    ['min-heap' as const, minHeap, TESTS_DATA.decrease.minHeap],
   ])(
     '[%s] Decrease',
     (
@@ -459,22 +206,8 @@ describe('Core', () => {
   );
 
   describe.each([
-    [
-      'max-heap' as const,
-      maxHeap,
-      {
-        values: [8, 6, 5, 2, 9, 4, 1, 7, 3],
-        expectedInOrder: [9, 8, 5, 7, 6, 4, 1, 2, 3],
-      },
-    ],
-    [
-      'min-heap' as const,
-      minHeap,
-      {
-        values: [8, 6, 5, 2, 9, 4, 1, 7, 3],
-        expectedInOrder: [1, 3, 2, 5, 9, 6, 4, 8, 7],
-      },
-    ],
+    ['max-heap' as const, maxHeap, TESTS_DATA.iterators.maxHeap],
+    ['min-heap' as const, minHeap, TESTS_DATA.iterators.minHeap],
   ])('[%s] Iterators', (_instanceType, heap, { values, expectedInOrder }) => {
     const expectedInReverseOrder = [...expectedInOrder].reverse();
 
