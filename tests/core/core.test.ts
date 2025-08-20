@@ -4,6 +4,7 @@ import {
   addAndValidate,
   decreaseAndValidate,
   increaseAndValidate,
+  isValidEmptyHeapObject,
   popAndValidate,
   removeAndValidate,
 } from './tests.core.util';
@@ -72,8 +73,7 @@ describe('Core', () => {
       const heap = mHeap.create();
 
       expect(isValidObjectInstance(heap, instanceType)).toBe(true);
-      // @todo
-      // expect(isValidEmptyMinHeapObj(heap)).toBe(true);
+      expect(isValidEmptyHeapObject(instanceType, heap)).toBe(true);
 
       addValues.forEach((num, i) =>
         addAndValidate(instanceType, heap, num, expectedOnAdd[i])
@@ -83,8 +83,7 @@ describe('Core', () => {
         popAndValidate(instanceType, heap, num, expectedOnRemove[i])
       );
 
-      // @todo
-      // expect(isValidEmptyMinHeapObj(heap)).toBe(true);
+      expect(isValidEmptyHeapObject(instanceType, heap)).toBe(true);
     }
   );
 
@@ -151,9 +150,7 @@ describe('Core', () => {
       const heap = mHeap.create();
 
       expect(isValidObjectInstance(heap, instanceType)).toBe(true);
-
-      // @todo
-      // expect(isValidEmptyMaxHeapObj(heap)).toBe(true);
+      expect(isValidEmptyHeapObject(instanceType, heap)).toBe(true);
 
       addValues.forEach((num, i) =>
         addAndValidate(instanceType, heap, num, expectedOnAdd[i])
@@ -163,8 +160,7 @@ describe('Core', () => {
         popAndValidate(instanceType, heap, num, expectedOnRemove[i])
       );
 
-      // @todo
-      // expect(isValidEmptyMaxHeapObj(heap)).toBe(true);
+      expect(isValidEmptyHeapObject(instanceType, heap)).toBe(true);
     }
   );
 
@@ -207,9 +203,7 @@ describe('Core', () => {
       const heap = mHeap.create();
 
       expect(isValidObjectInstance(heap, instanceType)).toBe(true);
-
-      // @todo
-      // expect(isValidEmptyMaxHeapObj(heap)).toBe(true);
+      expect(isValidEmptyHeapObject(instanceType, heap)).toBe(true);
 
       addValues.forEach((num, i) =>
         addAndValidate(instanceType, heap, num, expectedOnAdd[i])
@@ -219,8 +213,7 @@ describe('Core', () => {
 
       mHeap.clear(heap);
 
-      // @todo
-      // expect(isValidEmptyMaxHeapObj(heap)).toBe(true);
+      expect(isValidEmptyHeapObject(instanceType, heap)).toBe(true);
     }
   );
 
@@ -294,8 +287,7 @@ describe('Core', () => {
         )
       );
 
-      // @todo
-      // expect(isValidEmptyMinHeapObj(heap)).toBe(true);
+      expect(isValidEmptyHeapObject(instanceType, heap)).toBe(true);
     }
   );
 

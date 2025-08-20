@@ -9,75 +9,43 @@ import {
 /* ---------- // Helper functions ---------- */
 /* ----------------------------------------- */
 
-function heapKeys(heap: IHeapArray) {
+function heapKeys<A extends IHeapArray>(heap: A) {
   return heap.reduce((acc, { key }) => {
     acc.push(key);
     return acc;
   }, [] as number[]);
 }
 
-function isValidMaxHeap<A extends IHeapArray>(instance: A) {
+function isValidHeap<A extends IHeapArray>(
+  instanceType: 'max-heap' | 'min-heap',
+  instance: A
+) {
   let isValid = true;
 
-  const fn = (index: number) => {
-    if (undefined !== instance[index]) {
-      const li = getLeftChildIndex(index);
-      const ri = getRightChildIndex(index);
+  const stack = [0];
+  for (
+    let index = stack.shift();
+    isValid && index !== undefined;
+    index = stack.shift()
+  ) {
+    isValid = [getLeftChildIndex(index), getRightChildIndex(index)].reduce(
+      (acc, curr) => {
+        if (acc && undefined !== instance[curr]) {
+          acc =
+            'max-heap' === instanceType
+              ? instance[index].key >= instance[curr].key
+              : instance[index].key <= instance[curr].key;
 
-      if (undefined !== instance[li]) {
-        if (instance[index].key < instance[li].key) {
-          isValid = false;
-          return;
+          if (acc) {
+            stack.push(curr);
+          }
         }
 
-        fn(li);
-      }
-
-      if (undefined !== instance[ri]) {
-        if (instance[index].key < instance[ri].key) {
-          isValid = false;
-          return;
-        }
-
-        fn(ri);
-      }
-    }
-  };
-
-  fn(0);
-
-  return isValid;
-}
-
-function isValidMinHeap<A extends IHeapArray>(instance: A) {
-  let isValid = true;
-
-  const fn = (index: number) => {
-    if (undefined !== instance[index]) {
-      const li = getLeftChildIndex(index);
-      const ri = getRightChildIndex(index);
-
-      if (undefined !== instance[li]) {
-        if (instance[index].key > instance[li].key) {
-          isValid = false;
-          return;
-        }
-
-        fn(li);
-      }
-
-      if (undefined !== instance[ri]) {
-        if (instance[index].key > instance[ri].key) {
-          isValid = false;
-          return;
-        }
-
-        fn(ri);
-      }
-    }
-  };
-
-  fn(0);
+        return acc;
+      },
+      isValid
+    );
+  }
 
   return isValid;
 }
@@ -86,102 +54,103 @@ function isValidMinHeap<A extends IHeapArray>(instance: A) {
 /* ---------- Helper functions // ---------- */
 /* ----------------------------------------- */
 
-export function addAndValidate(
+export function addAndValidate<A extends IHeapArray>(
   instanceType: 'max-heap' | 'min-heap',
-  heap: IHeapArray,
+  heap: A,
   value: number,
-  expected: number[]
+  expectedKeys: number[]
 ) {
   const node = { key: value };
 
   expect(isValidObjectInstance(node, 'heap-node')).toBe(true);
+  expect(isValidHeap(instanceType, heap)).toBe(true);
 
   if ('max-heap' === instanceType) {
-    expect(isValidMaxHeap(heap)).toBe(true);
     expect(maxHeap.add(heap, node)).toBe(undefined);
   } else {
-    expect(isValidMinHeap(heap)).toBe(true);
     expect(minHeap.add(heap, node)).toBe(undefined);
   }
 
-  expect(heapKeys(heap)).toStrictEqual(expected);
+  expect(heapKeys(heap)).toStrictEqual(expectedKeys);
 }
 
-export function popAndValidate(
+export function popAndValidate<A extends IHeapArray>(
   instanceType: 'max-heap' | 'min-heap',
-  heap: IHeapArray,
-  key: number,
-  expected: number[]
+  heap: A,
+  rootNodeKey: number,
+  expectedKeys: number[]
 ) {
   if ('max-heap' === instanceType) {
-    expect(maxHeap.peek(heap)?.key).toBe(key);
-    expect(maxHeap.pop(heap)?.key).toStrictEqual(key);
-    expect(isValidMaxHeap(heap)).toBe(true);
+    expect(maxHeap.peek(heap)?.key).toBe(rootNodeKey);
+    expect(maxHeap.pop(heap)?.key).toBe(rootNodeKey);
   } else {
-    expect(minHeap.peek(heap)?.key).toBe(key);
-    expect(minHeap.pop(heap)?.key).toStrictEqual(key);
-    expect(isValidMinHeap(heap)).toBe(true);
+    expect(minHeap.peek(heap)?.key).toBe(rootNodeKey);
+    expect(minHeap.pop(heap)?.key).toBe(rootNodeKey);
   }
 
-  expect(heapKeys(heap)).toStrictEqual(expected);
+  expect(isValidHeap(instanceType, heap)).toBe(true);
+  expect(heapKeys(heap)).toStrictEqual(expectedKeys);
 }
 
-export function removeAndValidate(
+export function removeAndValidate<A extends IHeapArray>(
   instanceType: 'max-heap' | 'min-heap',
-  heap: IHeapArray,
-  node: IHeapArray[0],
-  expected: number[]
+  heap: A,
+  removeNode: A[0],
+  expectedKeys: number[]
 ) {
   if ('max-heap' === instanceType) {
-    expect(maxHeap.remove(heap, node)).toBe(true);
+    expect(maxHeap.remove(heap, removeNode)).toBe(true);
   } else {
-    expect(minHeap.remove(heap, node)).toBe(true);
+    expect(minHeap.remove(heap, removeNode)).toBe(true);
   }
 
-  expect(heapKeys(heap)).toStrictEqual(expected);
+  expect(heapKeys(heap)).toStrictEqual(expectedKeys);
 }
 
-export function increaseAndValidate(
+export function increaseAndValidate<A extends IHeapArray>(
   instanceType: 'max-heap' | 'min-heap',
-  heap: IHeapArray,
-  node: IHeapArray[0],
+  heap: A,
+  increaseNode: A[0],
   increaseValue: number,
-  expected: number[]
+  expectedKeys: number[]
 ) {
   if ('max-heap' === instanceType) {
-    expect(maxHeap.increase(heap, node, increaseValue)).toBe(true);
+    expect(maxHeap.increase(heap, increaseNode, increaseValue)).toBe(true);
   } else {
-    expect(minHeap.increase(heap, node, increaseValue)).toBe(true);
+    expect(minHeap.increase(heap, increaseNode, increaseValue)).toBe(true);
   }
 
-  expect(heapKeys(heap)).toStrictEqual(expected);
+  expect(heapKeys(heap)).toStrictEqual(expectedKeys);
 }
 
-export function decreaseAndValidate(
+export function decreaseAndValidate<A extends IHeapArray>(
   instanceType: 'max-heap' | 'min-heap',
-  heap: IHeapArray,
-  node: IHeapArray[0],
+  heap: A,
+  decreaseNode: A[0],
   decreaseValue: number,
-  expected: number[]
+  expectedKeys: number[]
 ) {
   if ('max-heap' === instanceType) {
-    expect(maxHeap.decrease(heap, node, decreaseValue)).toBe(true);
+    expect(maxHeap.decrease(heap, decreaseNode, decreaseValue)).toBe(true);
   } else {
-    expect(minHeap.decrease(heap, node, decreaseValue)).toBe(true);
+    expect(minHeap.decrease(heap, decreaseNode, decreaseValue)).toBe(true);
   }
 
-  expect(heapKeys(heap)).toStrictEqual(expected);
+  expect(heapKeys(heap)).toStrictEqual(expectedKeys);
 }
 
-export function isValidEmptyMaxHeapObj(heap: IHeapArray) {
-  return (
-    0 === heap.length &&
-    undefined === maxHeap.peek(heap) &&
-    undefined === maxHeap.pop(heap)
-  );
-}
+export function isValidEmptyHeapObject<A extends IHeapArray>(
+  instanceType: 'max-heap' | 'min-heap',
+  heap: A
+) {
+  if ('max-heap' === instanceType) {
+    return (
+      0 === heap.length &&
+      undefined === maxHeap.peek(heap) &&
+      undefined === maxHeap.pop(heap)
+    );
+  }
 
-export function isValidEmptyMinHeapObj(heap: IHeapArray) {
   return (
     0 === heap.length &&
     undefined === minHeap.peek(heap) &&
