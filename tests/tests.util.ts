@@ -21,8 +21,8 @@ export function heapKeys(heap: IHeapArray | MaxHeap | MinHeap) {
 }
 
 export function isValidObjectInstance(
-  instance: unknown,
-  instanceType: 'max-heap' | 'min-heap' | 'heap-node'
+  instanceType: 'max-heap' | 'min-heap' | 'heap-node',
+  instance: unknown
 ) {
   if ('object' !== typeof instance) {
     return false;
@@ -49,8 +49,8 @@ export function isValidObjectInstance(
 }
 
 export function isValidClassInstance(
-  instance: unknown,
-  instanceType: 'MaxHeap' | 'MinHeap'
+  instanceType: 'MaxHeap' | 'MinHeap',
+  instance: unknown
 ) {
   if ('object' !== typeof instance) {
     return false;

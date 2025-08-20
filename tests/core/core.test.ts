@@ -4,7 +4,7 @@ import {
   addAndValidate,
   decreaseAndValidate,
   increaseAndValidate,
-  isValidEmptyHeapObject,
+  isValidEmptyHeap,
   popAndValidate,
   removeAndValidate,
 } from './tests.core.util';
@@ -16,7 +16,8 @@ describe('Core', () => {
       maxHeap,
       {
         addValues: [10, 15, 30, 40, 50, 100, 40],
-        expectedOnAdd: [
+        removeValues: [100, 50, 40, 40, 30, 15, 10],
+        expectedAfterAdditions: [
           [10],
           [15, 10],
           [30, 10, 15],
@@ -25,8 +26,7 @@ describe('Core', () => {
           [100, 40, 50, 10, 30, 15],
           [100, 40, 50, 10, 30, 15, 40],
         ],
-        removeValues: [100, 50, 40, 40, 30, 15, 10],
-        expectedOnRemove: [
+        expectedAfterRemovals: [
           [50, 40, 40, 10, 30, 15],
           [40, 30, 40, 10, 15],
           [40, 30, 15, 10],
@@ -42,7 +42,8 @@ describe('Core', () => {
       minHeap,
       {
         addValues: [10, 15, 30, 40, 50, 100, 40],
-        expectedOnAdd: [
+        removeValues: [10, 15, 30, 40, 40, 50, 100],
+        expectedAfterAdditions: [
           [10],
           [10, 15],
           [10, 15, 30],
@@ -51,8 +52,7 @@ describe('Core', () => {
           [10, 15, 30, 40, 50, 100],
           [10, 15, 30, 40, 50, 100, 40],
         ],
-        removeValues: [10, 15, 30, 40, 40, 50, 100],
-        expectedOnRemove: [
+        expectedAfterRemovals: [
           [15, 40, 30, 40, 50, 100],
           [30, 40, 100, 40, 50],
           [40, 40, 100, 50],
@@ -67,23 +67,25 @@ describe('Core', () => {
     '[%s] Create, add, peek, and pop (1)',
     (
       instanceType,
-      mHeap,
-      { addValues, expectedOnAdd, removeValues, expectedOnRemove }
+      heap,
+      { addValues, removeValues, expectedAfterAdditions, expectedAfterRemovals }
     ) => {
-      const heap = mHeap.create();
+      const instance = heap.create();
 
-      expect(isValidObjectInstance(heap, instanceType)).toBe(true);
-      expect(isValidEmptyHeapObject(instanceType, heap)).toBe(true);
+      expect(isValidObjectInstance(instanceType, instance)).toBe(true);
+      expect(isValidEmptyHeap(instanceType, instance)).toBe(true);
 
-      addValues.forEach((num, i) =>
-        addAndValidate(instanceType, heap, num, expectedOnAdd[i])
+      addValues.forEach((key, i) =>
+        addAndValidate(instanceType, instance, key, expectedAfterAdditions[i])
       );
 
-      removeValues.forEach((num, i) =>
-        popAndValidate(instanceType, heap, num, expectedOnRemove[i])
+      expect(heap.size(instance)).toBe(addValues.length);
+
+      removeValues.forEach((key, i) =>
+        popAndValidate(instanceType, instance, key, expectedAfterRemovals[i])
       );
 
-      expect(isValidEmptyHeapObject(instanceType, heap)).toBe(true);
+      expect(isValidEmptyHeap(instanceType, instance)).toBe(true);
     }
   );
 
@@ -93,7 +95,8 @@ describe('Core', () => {
       maxHeap,
       {
         addValues: [40, 100, 50, 40, 30, 15, 10],
-        expectedOnAdd: [
+        removeValues: [100, 50, 40, 40, 30, 15, 10],
+        expectedAfterAdditions: [
           [40],
           [100, 40],
           [100, 40, 50],
@@ -102,8 +105,7 @@ describe('Core', () => {
           [100, 40, 50, 40, 30, 15],
           [100, 40, 50, 40, 30, 15, 10],
         ],
-        removeValues: [100, 50, 40, 40, 30, 15, 10],
-        expectedOnRemove: [
+        expectedAfterRemovals: [
           [50, 40, 15, 40, 30, 10],
           [40, 40, 15, 10, 30],
           [40, 30, 15, 10],
@@ -119,7 +121,8 @@ describe('Core', () => {
       minHeap,
       {
         addValues: [40, 100, 50, 40, 30, 15, 10],
-        expectedOnAdd: [
+        removeValues: [10, 15, 30, 40, 40, 50, 100],
+        expectedAfterAdditions: [
           [40],
           [40, 100],
           [40, 100, 50],
@@ -128,8 +131,7 @@ describe('Core', () => {
           [15, 40, 30, 100, 40, 50],
           [10, 40, 15, 100, 40, 50, 30],
         ],
-        removeValues: [10, 15, 30, 40, 40, 50, 100],
-        expectedOnRemove: [
+        expectedAfterRemovals: [
           [15, 40, 30, 100, 40, 50],
           [30, 40, 50, 100, 40],
           [40, 40, 50, 100],
@@ -144,23 +146,25 @@ describe('Core', () => {
     '[%s] Create, add, peek, and pop (2)',
     (
       instanceType,
-      mHeap,
-      { addValues, expectedOnAdd, removeValues, expectedOnRemove }
+      heap,
+      { addValues, removeValues, expectedAfterAdditions, expectedAfterRemovals }
     ) => {
-      const heap = mHeap.create();
+      const instance = heap.create();
 
-      expect(isValidObjectInstance(heap, instanceType)).toBe(true);
-      expect(isValidEmptyHeapObject(instanceType, heap)).toBe(true);
+      expect(isValidObjectInstance(instanceType, instance)).toBe(true);
+      expect(isValidEmptyHeap(instanceType, instance)).toBe(true);
 
-      addValues.forEach((num, i) =>
-        addAndValidate(instanceType, heap, num, expectedOnAdd[i])
+      addValues.forEach((key, i) =>
+        addAndValidate(instanceType, instance, key, expectedAfterAdditions[i])
       );
 
-      removeValues.forEach((num, i) =>
-        popAndValidate(instanceType, heap, num, expectedOnRemove[i])
+      expect(heap.size(instance)).toBe(addValues.length);
+
+      removeValues.forEach((key, i) =>
+        popAndValidate(instanceType, instance, key, expectedAfterRemovals[i])
       );
 
-      expect(isValidEmptyHeapObject(instanceType, heap)).toBe(true);
+      expect(isValidEmptyHeap(instanceType, instance)).toBe(true);
     }
   );
 
@@ -170,7 +174,7 @@ describe('Core', () => {
       maxHeap,
       {
         addValues: [40, 100, 50, 40, 30, 15, 10],
-        expectedOnAdd: [
+        expectedAfterAdditions: [
           [40],
           [100, 40],
           [100, 40, 50],
@@ -186,7 +190,7 @@ describe('Core', () => {
       minHeap,
       {
         addValues: [40, 100, 50, 40, 30, 15, 10],
-        expectedOnAdd: [
+        expectedAfterAdditions: [
           [40],
           [40, 100],
           [40, 100, 50],
@@ -199,21 +203,21 @@ describe('Core', () => {
     ],
   ])(
     '[%s] Create, add and clear',
-    (instanceType, mHeap, { addValues, expectedOnAdd }) => {
-      const heap = mHeap.create();
+    (instanceType, heap, { addValues, expectedAfterAdditions }) => {
+      const instance = heap.create();
 
-      expect(isValidObjectInstance(heap, instanceType)).toBe(true);
-      expect(isValidEmptyHeapObject(instanceType, heap)).toBe(true);
+      expect(isValidObjectInstance(instanceType, instance)).toBe(true);
+      expect(isValidEmptyHeap(instanceType, instance)).toBe(true);
 
       addValues.forEach((num, i) =>
-        addAndValidate(instanceType, heap, num, expectedOnAdd[i])
+        addAndValidate(instanceType, instance, num, expectedAfterAdditions[i])
       );
 
-      expect(mHeap.size(heap)).toBe(addValues.length);
+      expect(heap.size(instance)).toBe(addValues.length);
 
-      mHeap.clear(heap);
+      heap.clear(instance);
 
-      expect(isValidEmptyHeapObject(instanceType, heap)).toBe(true);
+      expect(isValidEmptyHeap(instanceType, instance)).toBe(true);
     }
   );
 
@@ -223,9 +227,9 @@ describe('Core', () => {
       maxHeap,
       {
         values: [4, 7, 6, 1, 9, 3],
-        expectedOnInit: [9, 7, 6, 1, 4, 3],
+        expectedInitial: [9, 7, 6, 1, 4, 3],
         removeNodesIndices: [1, 2, 0, 4, 3, 5],
-        expectedOnRemove: [
+        expectedAfterRemovals: [
           [9, 4, 6, 1, 3],
           [9, 4, 3, 1],
           [9, 1, 3],
@@ -240,9 +244,9 @@ describe('Core', () => {
       minHeap,
       {
         values: [4, 7, 6, 1, 9, 3],
-        expectedOnInit: [1, 4, 3, 7, 9, 6],
+        expectedInitial: [1, 4, 3, 7, 9, 6],
         removeNodesIndices: [0, 5, 2, 3, 4, 1],
-        expectedOnRemove: [
+        expectedAfterRemovals: [
           [1, 6, 3, 7, 9],
           [1, 6, 9, 7],
           [1, 7, 9],
@@ -256,38 +260,33 @@ describe('Core', () => {
     '[%s] Remove',
     (
       instanceType,
-      mHeap,
-      { values, expectedOnInit, removeNodesIndices, expectedOnRemove }
+      heap,
+      { values, expectedInitial, removeNodesIndices, expectedAfterRemovals }
     ) => {
       const nodes = values.map((key) => ({ key }));
-      const heap = mHeap.create();
+      const instance = heap.create();
 
-      expect(heap.length).toBe(0);
-      expect(mHeap.remove(heap, { key: 999 })).toBe(false); // Try to remove a node from an empty heap.
-      expect(heap.length).toBe(0);
+      expect(heap.remove(instance, { key: 999 })).toBe(false); // Try to remove a node from an empty heap.
 
-      nodes.forEach((node) => mHeap.add(heap, node)); // Add heap nodes.
+      nodes.forEach((node) => heap.add(instance, node));
 
-      let i = 0;
-      heap.forEach((node) => {
-        expect(node.key).toStrictEqual(expectedOnInit[i]);
-        i += 1;
+      instance.forEach((node, i) => {
+        expect(node.key).toStrictEqual(expectedInitial[i]);
       });
 
-      expect(heap.length).toBe(values.length);
-      expect(mHeap.remove(heap, { key: 999 })).toBe(false); // Try to remove an invalid node.
-      expect(heap.length).toBe(values.length);
+      expect(heap.remove(instance, { key: 999 })).toBe(false); // Try to remove an invalid node.
+      expect(instance.length).toBe(values.length);
 
       removeNodesIndices.forEach((nodeIndex, i) =>
         removeAndValidate(
           instanceType,
-          heap,
+          instance,
           nodes[nodeIndex],
-          expectedOnRemove[i]
+          expectedAfterRemovals[i]
         )
       );
 
-      expect(isValidEmptyHeapObject(instanceType, heap)).toBe(true);
+      expect(isValidEmptyHeap(instanceType, instance)).toBe(true);
     }
   );
 
@@ -297,8 +296,8 @@ describe('Core', () => {
       maxHeap,
       {
         values: [4, 7, 6, 1, 9],
-        expectedOnInit: [9, 7, 6, 1, 4],
-        increaseNodesValues: [
+        expectedValuesOrder: [9, 7, 6, 1, 4],
+        nodeIndexIncreaseValuePairs: [
           [2, 0],
           [0, 4],
           [1, 3],
@@ -306,7 +305,7 @@ describe('Core', () => {
           [3, 7],
           [2, 10],
         ],
-        expectedOnIncrease: [
+        expectedAfterIncreases: [
           [9, 7, 6, 1, 4],
           [9, 8, 6, 1, 7],
           [10, 9, 6, 1, 8],
@@ -321,8 +320,8 @@ describe('Core', () => {
       minHeap,
       {
         values: [4, 7, 6, 1, 9],
-        expectedOnInit: [1, 4, 6, 7, 9],
-        increaseNodesValues: [
+        expectedValuesOrder: [1, 4, 6, 7, 9],
+        nodeIndexIncreaseValuePairs: [
           [2, 0],
           [0, 4],
           [1, 3],
@@ -330,7 +329,7 @@ describe('Core', () => {
           [3, 7],
           [2, 10],
         ],
-        expectedOnIncrease: [
+        expectedAfterIncreases: [
           [1, 4, 6, 7, 9],
           [1, 7, 6, 8, 9],
           [1, 8, 6, 10, 9],
@@ -344,31 +343,34 @@ describe('Core', () => {
     '[%s] Increase',
     (
       instanceType,
-      mHeap,
-      { values, expectedOnInit, increaseNodesValues, expectedOnIncrease }
+      heap,
+      {
+        values,
+        expectedValuesOrder,
+        nodeIndexIncreaseValuePairs,
+        expectedAfterIncreases,
+      }
     ) => {
       const nodes = values.map((key) => ({ key }));
-      const heap = mHeap.create(nodes);
+      const instance = heap.create(nodes);
 
-      let i = 0;
-      heap.forEach((node) => {
-        expect(node.key).toStrictEqual(expectedOnInit[i]);
-        i += 1;
+      instance.forEach((node, i) => {
+        expect(node.key).toStrictEqual(expectedValuesOrder[i]);
       });
 
-      increaseNodesValues.forEach(([nodeIndex, increaseValue], i) =>
+      nodeIndexIncreaseValuePairs.forEach(([nodeIndex, increaseValue], i) =>
         increaseAndValidate(
           instanceType,
-          heap,
+          instance,
           nodes[nodeIndex],
           increaseValue,
-          expectedOnIncrease[i]
+          expectedAfterIncreases[i]
         )
       );
 
-      expect(maxHeap.increase(heap, { key: 999 }, 111)).toBe(false); // Try to decrease the value of an invalid node.
+      expect(maxHeap.increase(instance, { key: 999 }, 111)).toBe(false); // Try to decrease the value of an invalid node.
 
-      maxHeap.clear(heap);
+      maxHeap.clear(instance);
     }
   );
 
@@ -378,8 +380,8 @@ describe('Core', () => {
       maxHeap,
       {
         values: [4, 7, 6, 1, 9],
-        expectedOnInit: [9, 7, 6, 1, 4],
-        decreaseNodesValues: [
+        expectedValuesOrder: [9, 7, 6, 1, 4],
+        nodeIndexDecreaseValuePairs: [
           [2, 0],
           [0, 4],
           [1, 3],
@@ -387,7 +389,7 @@ describe('Core', () => {
           [3, 7],
           [2, 10],
         ],
-        expectedOnDecrease: [
+        expectedAfterDecreases: [
           [9, 7, 6, 1, 4],
           [9, 7, 6, 1, 0],
           [9, 4, 6, 1, 0],
@@ -402,8 +404,8 @@ describe('Core', () => {
       minHeap,
       {
         values: [4, 7, 6, 1, 9],
-        expectedOnInit: [1, 4, 6, 7, 9],
-        decreaseNodesValues: [
+        expectedValuesOrder: [1, 4, 6, 7, 9],
+        nodeIndexDecreaseValuePairs: [
           [2, 0],
           [0, 4],
           [1, 3],
@@ -411,7 +413,7 @@ describe('Core', () => {
           [3, 7],
           [2, 10],
         ],
-        expectedOnDecrease: [
+        expectedAfterDecreases: [
           [1, 4, 6, 7, 9],
           [0, 1, 6, 7, 9],
           [0, 1, 6, 4, 9],
@@ -425,31 +427,34 @@ describe('Core', () => {
     '[%s] Decrease',
     (
       instanceType,
-      mHeap,
-      { values, expectedOnInit, decreaseNodesValues, expectedOnDecrease }
+      heap,
+      {
+        values,
+        expectedValuesOrder,
+        nodeIndexDecreaseValuePairs,
+        expectedAfterDecreases,
+      }
     ) => {
       const nodes = values.map((key) => ({ key }));
-      const heap = mHeap.create(nodes);
+      const instance = heap.create(nodes);
 
-      let i = 0;
-      heap.forEach((node) => {
-        expect(node.key).toStrictEqual(expectedOnInit[i]);
-        i += 1;
+      instance.forEach((node, i) => {
+        expect(node.key).toStrictEqual(expectedValuesOrder[i]);
       });
 
-      decreaseNodesValues.forEach(([nodeIndex, increaseValue], i) =>
+      nodeIndexDecreaseValuePairs.forEach(([nodeIndex, decreaseValue], i) =>
         decreaseAndValidate(
           instanceType,
-          heap,
+          instance,
           nodes[nodeIndex],
-          increaseValue,
-          expectedOnDecrease[i]
+          decreaseValue,
+          expectedAfterDecreases[i]
         )
       );
 
-      expect(maxHeap.decrease(heap, { key: 999 }, 111)).toBe(false); // Try to decrease the value of an invalid node.
+      expect(maxHeap.decrease(instance, { key: 999 }, 111)).toBe(false); // Try to decrease the value of an invalid node.
 
-      mHeap.clear(heap);
+      heap.clear(instance);
     }
   );
 
@@ -458,76 +463,82 @@ describe('Core', () => {
       'max-heap' as const,
       maxHeap,
       {
-        initialValues: [8, 6, 5, 2, 9, 4, 1, 7, 3],
-        expectedValues: [9, 8, 5, 7, 6, 4, 1, 2, 3],
+        values: [8, 6, 5, 2, 9, 4, 1, 7, 3],
+        expectedInOrder: [9, 8, 5, 7, 6, 4, 1, 2, 3],
       },
     ],
     [
       'min-heap' as const,
       minHeap,
       {
-        initialValues: [8, 6, 5, 2, 9, 4, 1, 7, 3],
-        expectedValues: [1, 3, 2, 5, 9, 6, 4, 8, 7],
+        values: [8, 6, 5, 2, 9, 4, 1, 7, 3],
+        expectedInOrder: [1, 3, 2, 5, 9, 6, 4, 8, 7],
       },
     ],
-  ])('[%s] Iterators', (_, mHeap, { initialValues, expectedValues }) => {
-    const expectedValuesReversed = [...expectedValues].reverse();
+  ])('[%s] Iterators', (_instanceType, heap, { values, expectedInOrder }) => {
+    const expectedInReverseOrder = [...expectedInOrder].reverse();
+
+    let instance: ReturnType<typeof heap.create>;
+
+    beforeEach(() => {
+      instance = heap.create(values.map((key) => ({ key })));
+    });
+
+    afterEach(() => {
+      heap.clear(instance);
+    });
 
     it('Entries', () => {
-      const heap = mHeap.create(initialValues.map((key) => ({ key })));
+      const arr: number[] = [];
 
-      const values: number[] = [];
-      for (const entry of mHeap.entries(heap)) {
-        values.push(entry.key);
+      for (const entry of heap.entries(instance)) {
+        arr.push(entry.key);
       }
 
-      const valuesReversed: number[] = [];
-      for (const entry of mHeap.entries(heap, true)) {
-        valuesReversed.push(entry.key);
+      expect(arr).toStrictEqual(expectedInOrder);
+
+      arr.length = 0;
+
+      for (const entry of heap.entries(instance, true)) {
+        arr.push(entry.key);
       }
 
-      expect(values).toStrictEqual(expectedValues);
-      expect(valuesReversed).toStrictEqual(expectedValuesReversed);
-
-      mHeap.clear(heap);
+      expect(arr).toStrictEqual(expectedInReverseOrder);
     });
 
     it('Keys', () => {
-      const heap = mHeap.create(initialValues.map((key) => ({ key })));
+      const arr: number[] = [];
 
-      const values: number[] = [];
-      for (const key of mHeap.keys(heap)) {
-        values.push(key);
+      for (const key of heap.keys(instance)) {
+        arr.push(key);
       }
 
-      const valuesReversed: number[] = [];
-      for (const key of mHeap.keys(heap, true)) {
-        valuesReversed.push(key);
+      expect(arr).toStrictEqual(expectedInOrder);
+
+      arr.length = 0;
+
+      for (const key of heap.keys(instance, true)) {
+        arr.push(key);
       }
 
-      expect(values).toStrictEqual(expectedValues);
-      expect(valuesReversed).toStrictEqual(expectedValuesReversed);
-
-      mHeap.clear(heap);
+      expect(arr).toStrictEqual(expectedInReverseOrder);
     });
 
     it('For-each', () => {
-      const heap = mHeap.create(initialValues.map((key) => ({ key })));
-      heap.forEach(({ key }, i) => expect(key).toBe(expectedValues[i]));
-      mHeap.clear(heap);
+      instance.forEach(({ key }, index, heapInstance) => {
+        expect(key).toBe(expectedInOrder[index]);
+        expect(heapInstance).toStrictEqual(instance);
+      });
     });
 
     it('For-of', () => {
-      const heap = mHeap.create(initialValues.map((key) => ({ key })));
+      const arr: number[] = [];
 
-      const values: number[] = [];
-      for (let { key } of heap) {
-        values.push(key);
+      for (let { key } of instance) {
+        arr.push(key);
       }
 
-      expect(values).toStrictEqual(expectedValues);
-
-      mHeap.clear(heap);
+      expect(arr).toStrictEqual(expectedInOrder);
     });
   });
 });
