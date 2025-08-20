@@ -12,7 +12,7 @@ import { AbstractHeap } from './AbstractHeap';
  */
 export class MaxHeap<N extends IHeapNode = IHeapNode> extends AbstractHeap<N> {
   /** Private field holding the internal heap data structure */
-  #heap: IHeapArray<N>;
+  readonly #heap: IHeapArray<N>;
 
   /**
    * Creates a new `MaxHeap` instance.
@@ -99,9 +99,10 @@ export class MaxHeap<N extends IHeapNode = IHeapNode> extends AbstractHeap<N> {
      */
     thisArg?: any
   ) {
-    let i = 0;
+    let index = 0;
     for (const node of this.entries()) {
-      callback.call(thisArg, node, i++, this);
+      callback.call(thisArg, node, index, this);
+      index += 1;
     }
   }
 
