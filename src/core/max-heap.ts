@@ -229,13 +229,13 @@ export function increase<H extends IHeapArray>(
  * @typeParam H - The type of max-heap array.
  * @param instance - The max-heap instance.
  * @param node - The element to modify.
- * @param dencreaseValue - Amount to decrease the key by.
+ * @param decreaseValue - Amount to decrease the key by.
  * @returns `true` if element was found and modified, `false` otherwise.
  */
 export function decrease<H extends IHeapArray>(
   instance: H,
   node: H[0],
-  dencreaseValue: number
+  decreaseValue: number
 ) {
   const index = instance.indices.get(node);
 
@@ -243,7 +243,7 @@ export function decrease<H extends IHeapArray>(
     return false;
   }
 
-  node.key -= dencreaseValue;
+  node.key -= decreaseValue;
   heapifyDown(instance, index);
 
   return true;

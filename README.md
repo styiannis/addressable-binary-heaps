@@ -1,5 +1,8 @@
 # Addressable Binary Heaps
 
+[![NPM Version](https://img.shields.io/npm/v/addressable-binary-heaps)](https://www.npmjs.com/package/addressable-binary-heaps)
+[![Coverage Status](https://img.shields.io/coverallsCoverage/github/styiannis/addressable-binary-heaps)](https://coveralls.io/github/styiannis/addressable-binary-heaps?branch=main)
+
 A versatile TypeScript library for addressable binary heaps, delivering optimized and scalable min-heap and max-heap implementations, seamlessly supporting both object-oriented and functional paradigms.
 
 ## Key Features
@@ -270,7 +273,7 @@ This approach is convenient when you need a broad range of functionalities from 
 
 For maximum control and minimal footprint, import individual functions or operations.
 
-#### For Max Heap:
+#### For Max Heap
 
 ```typescript
 import {
@@ -288,7 +291,7 @@ import {
 } from 'addressable-binary-heaps/max-heap';
 ```
 
-#### For Min Heap:
+#### For Min Heap
 
 ```typescript
 import {
