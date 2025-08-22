@@ -1,6 +1,5 @@
-import { MaxHeap, MinHeap } from '../../src';
-import { IHeapArray } from '../../src/types';
-import { heapKeys } from '../tests.util';
+import { IHeapArray, MaxHeap, MinHeap } from '../../src';
+import { heapKeys } from '../tests-util';
 
 export function addAndValidate(
   instance: MaxHeap | MinHeap,

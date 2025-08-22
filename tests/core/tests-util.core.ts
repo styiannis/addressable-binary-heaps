@@ -1,9 +1,9 @@
 import { IHeapArray, maxHeap, minHeap } from '../../src';
-import { isValidObjectInstance } from '../tests.util';
 import {
   getLeftChildIndex,
   getRightChildIndex,
 } from '../../src/core/heap.util';
+import { isValidObjectInstance } from '../tests-util';
 
 /* ----------------------------------------- */
 /* ---------- // Helper functions ---------- */

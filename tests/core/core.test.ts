@@ -1,6 +1,6 @@
 import { maxHeap, minHeap } from '../../src';
-import { TESTS_DATA } from '../tests.data';
-import { isValidObjectInstance } from '../tests.util';
+import { TESTS_DATA } from '../tests-constants';
+import { isValidObjectInstance } from '../tests-util';
 import {
   addAndValidate,
   decreaseAndValidate,
@@ -8,7 +8,7 @@ import {
   isValidEmptyHeap,
   popAndValidate,
   removeAndValidate,
-} from './tests.core.util';
+} from './tests-util.core';
 
 describe('Core', () => {
   it.each([
