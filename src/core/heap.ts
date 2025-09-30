@@ -71,7 +71,7 @@ export function* entries<H extends IHeapArray>(instance: H, reversed: boolean) {
 export function* keys<H extends IHeapArray>(instance: H, reversed: boolean) {
   if (reversed) {
     for (let i = instance.length - 1; i >= 0; i -= 1) {
-      yield instance[i].key;
+      yield (instance[i] as H[0]).key;
     }
     return;
   }

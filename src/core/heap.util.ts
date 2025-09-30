@@ -47,8 +47,8 @@ export function swapHeapNodes<H extends IHeapArray = IHeapArray>(
   secondIndex: number
 ) {
   const node = instance[firstIndex];
-  instance[firstIndex] = instance[secondIndex];
-  instance[secondIndex] = node;
+  instance[firstIndex] = instance[secondIndex] as H[0];
+  instance[secondIndex] = node as H[0];
   instance.indices.set(instance[firstIndex], firstIndex);
   instance.indices.set(instance[secondIndex], secondIndex);
 }

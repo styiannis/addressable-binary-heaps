@@ -16,27 +16,31 @@ import {
  * Compares the element with its children and swaps with the larger child if necessary.
  *
  * @typeParam H - The type of max-heap array.
- * @param instance - The max-heap instance  to rebalance.
+ * @param instance - The max-heap instance to rebalance.
  * @param index - Starting index of the element to move down.
  */
 function heapifyDown<H extends IHeapArray>(instance: H, index: number) {
-  let i = index;
-  let li = getLeftChildIndex(i);
-  while (li < instance.length) {
-    const ri = getRightChildIndex(i);
+  const li = getLeftChildIndex(index);
+  const leftChild = instance[li];
 
-    const higherKeyIndex =
-      ri < instance.length && instance[ri].key > instance[li].key ? ri : li;
-
-    if (instance[i].key >= instance[higherKeyIndex].key) {
-      break;
-    }
-
-    swapHeapNodes(instance, i, higherKeyIndex);
-
-    i = higherKeyIndex;
-    li = getLeftChildIndex(i);
+  if (leftChild === undefined) {
+    return;
   }
+
+  const ri = getRightChildIndex(index);
+  const rightChild = instance[ri];
+
+  const higherKeyChildIndex =
+    rightChild !== undefined && rightChild.key > leftChild.key ? ri : li;
+
+  if (
+    (instance[index] as H[0]).key >= (instance[higherKeyChildIndex] as H[0]).key
+  ) {
+    return;
+  }
+
+  swapHeapNodes(instance, index, higherKeyChildIndex);
+  heapifyDown(instance, higherKeyChildIndex);
 }
 
 /**
@@ -48,13 +52,17 @@ function heapifyDown<H extends IHeapArray>(instance: H, index: number) {
  * @param index - Starting index of the element to move up.
  */
 function heapifyUp<H extends IHeapArray>(instance: H, index: number) {
-  for (
-    let i = index, pi = getParentIndex(i);
-    0 <= pi && instance[pi].key <= instance[i].key;
-    i = pi, pi = getParentIndex(i)
+  const pi = getParentIndex(index);
+
+  if (
+    instance[pi] === undefined ||
+    instance[pi].key > (instance[index] as H[0]).key
   ) {
-    swapHeapNodes(instance, i, pi);
+    return;
   }
+
+  swapHeapNodes(instance, index, pi);
+  heapifyUp(instance, pi);
 }
 
 /* ----------------------------------------- */
