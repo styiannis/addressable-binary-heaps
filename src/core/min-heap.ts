@@ -79,7 +79,13 @@ export function create<H extends IHeapArray>(
 ) {
   const instance = [] as unknown as H;
   instance.indices = new WeakMap();
-  initialNodes?.forEach((node) => add(instance, node));
+
+  if (initialNodes) {
+    for (const node of initialNodes) {
+      add(instance, node);
+    }
+  }
+
   return instance;
 }
 
@@ -173,7 +179,7 @@ export function remove<H extends IHeapArray>(instance: H, node: H[0]) {
     return false;
   }
 
-  if (node === instance[instance.length - 1]) {
+  if (node === instance.at(-1)) {
     instance.pop();
     return true;
   }
