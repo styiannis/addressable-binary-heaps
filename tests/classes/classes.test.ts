@@ -1,6 +1,6 @@
 import { MaxHeap, MinHeap } from '../../src';
-import { TESTS_DATA } from '../tests-constants';
-import { isValidClassInstance } from '../tests-util';
+import { TESTS_DATA } from '../constants';
+import { isValidClassInstance } from '../util';
 import {
   addAndValidate,
   decreaseAndValidate,
@@ -8,7 +8,7 @@ import {
   isValidEmptyHeap,
   popAndValidate,
   removeAndValidate,
-} from './tests-util.classes';
+} from './classes-util';
 
 describe('Classes', () => {
   it.each([
@@ -204,7 +204,7 @@ describe('Classes', () => {
   ])('[%s] Iterators', (_instanceType, Heap, { values, expectedInOrder }) => {
     const expectedInReverseOrder = [...expectedInOrder].reverse();
 
-    let instance;
+    let instance: MaxHeap | MinHeap;
 
     beforeEach(() => {
       instance = new Heap(values.map((key) => ({ key })));
