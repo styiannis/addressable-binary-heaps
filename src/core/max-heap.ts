@@ -156,11 +156,11 @@ export function pop<H extends IHeapArray>(instance: H) {
 
   swapHeapNodes(instance, 0, instance.length - 1);
 
-  const ret = instance.pop() as H[0];
-  instance.indices.delete(ret);
+  const popped = instance.pop() as H[0];
+  instance.indices.delete(popped);
   heapifyDown(instance, 0);
 
-  return ret;
+  return popped;
 }
 
 /**
