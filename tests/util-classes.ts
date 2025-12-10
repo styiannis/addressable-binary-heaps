@@ -1,4 +1,4 @@
-import { IHeapArray, MaxHeap, MinHeap } from '../../src';
+import { IHeapArray, MaxHeap, MinHeap } from '../src';
 
 function heapKeys(heap: IHeapArray | MaxHeap | MinHeap) {
   const keys: number[] = [];
