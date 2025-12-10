@@ -7,7 +7,9 @@ import { IHeapArray } from '../types';
  * @param instance - The heap instance to clear.
  */
 export function clear<H extends IHeapArray>(instance: H) {
-  instance.forEach((node) => instance.indices.delete(node));
+  for (const node of instance) {
+    instance.indices.delete(node);
+  }
   instance.length = 0;
 }
 

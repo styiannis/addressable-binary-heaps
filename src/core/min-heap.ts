@@ -79,7 +79,13 @@ export function create<H extends IHeapArray>(
 ) {
   const instance = [] as unknown as H;
   instance.indices = new WeakMap();
-  initialNodes?.forEach((node) => add(instance, node));
+
+  if (initialNodes) {
+    for (const node of initialNodes) {
+      add(instance, node);
+    }
+  }
+
   return instance;
 }
 
@@ -148,15 +154,11 @@ export function pop<H extends IHeapArray>(instance: H) {
 
   swapHeapNodes(instance, 0, instance.length - 1);
 
-  const ret = instance.pop() as H[0];
-
-  if (ret) {
-    instance.indices.delete(ret);
-  }
-
+  const popped = instance.pop() as H[0];
+  instance.indices.delete(popped);
   heapifyDown(instance, 0);
 
-  return ret;
+  return popped;
 }
 
 /**
@@ -173,32 +175,21 @@ export function remove<H extends IHeapArray>(instance: H, node: H[0]) {
     return false;
   }
 
-  if (node === instance[instance.length - 1]) {
+  if (node === instance.at(-1)) {
     instance.pop();
     return true;
   }
 
   const index = instance.indices.get(node);
 
-  if (undefined === index) {
+  if (index === undefined) {
     return false;
   }
 
   swapHeapNodes(instance, index, instance.length - 1);
-
-  let ret = false;
-
-  const poppedNode = instance.pop();
-
-  if (poppedNode) {
-    ret = instance.indices.delete(poppedNode);
-  }
-
-  if (ret) {
-    heapifyDown(instance, index);
-  }
-
-  return ret;
+  const deleted = instance.indices.delete(instance.pop() as H[0]);
+  heapifyDown(instance, index);
+  return deleted;
 }
 
 /**

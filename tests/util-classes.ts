@@ -1,5 +1,12 @@
-import { IHeapArray, MaxHeap, MinHeap } from '../../src';
-import { heapKeys } from '../tests-util';
+import { IHeapArray, MaxHeap, MinHeap } from '../src';
+
+function heapKeys(heap: IHeapArray | MaxHeap | MinHeap) {
+  const keys: number[] = [];
+  for (let node of heap) {
+    keys.push(node.key);
+  }
+  return keys;
+}
 
 export function addAndValidate(
   instance: MaxHeap | MinHeap,

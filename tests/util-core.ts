@@ -1,13 +1,6 @@
-import { IHeapArray, maxHeap, minHeap } from '../../src';
-import {
-  getLeftChildIndex,
-  getRightChildIndex,
-} from '../../src/core/heap.util';
-import { isValidObjectInstance } from '../tests-util';
-
-/* ----------------------------------------- */
-/* ---------- // Helper functions ---------- */
-/* ----------------------------------------- */
+import { IHeapArray, maxHeap, minHeap } from '../src';
+import { getLeftChildIndex, getRightChildIndex } from '../src/core/heap.util';
+import { isValidObjectInstance } from './util';
 
 function heapKeys<A extends IHeapArray>(heap: A) {
   return heap.reduce((acc, { key }) => {
@@ -49,10 +42,6 @@ function isValidHeap<A extends IHeapArray>(
 
   return isValid;
 }
-
-/* ----------------------------------------- */
-/* ---------- Helper functions // ---------- */
-/* ----------------------------------------- */
 
 export function addAndValidate<A extends IHeapArray>(
   instanceType: 'max-heap' | 'min-heap',
