@@ -155,11 +155,7 @@ export function pop<H extends IHeapArray>(instance: H) {
   swapHeapNodes(instance, 0, instance.length - 1);
 
   const ret = instance.pop() as H[0];
-
-  if (ret) {
-    instance.indices.delete(ret);
-  }
-
+  instance.indices.delete(ret);
   heapifyDown(instance, 0);
 
   return ret;
@@ -186,25 +182,14 @@ export function remove<H extends IHeapArray>(instance: H, node: H[0]) {
 
   const index = instance.indices.get(node);
 
-  if (undefined === index) {
+  if (index === undefined) {
     return false;
   }
 
   swapHeapNodes(instance, index, instance.length - 1);
-
-  let ret = false;
-
-  const poppedNode = instance.pop();
-
-  if (poppedNode) {
-    ret = instance.indices.delete(poppedNode);
-  }
-
-  if (ret) {
-    heapifyDown(instance, index);
-  }
-
-  return ret;
+  const deleted = instance.indices.delete(instance.pop() as H[0]);
+  heapifyDown(instance, index);
+  return deleted;
 }
 
 /**
