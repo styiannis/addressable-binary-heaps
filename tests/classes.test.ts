@@ -26,15 +26,23 @@ describe('Classes', () => {
       expect(isValidClassInstance(instanceType, instance)).toBe(true);
       expect(isValidEmptyHeap(instance)).toBe(true);
 
-      addValues.forEach((key, i) =>
-        addAndValidate(instance, key, expectedAfterAdditions[i])
-      );
+      addValues.forEach((key, i) => {
+        const expectedKeys = expectedAfterAdditions[i];
+        expect(Array.isArray(expectedKeys)).toBe(true);
+        if (expectedKeys) {
+          addAndValidate(instance, key, expectedKeys);
+        }
+      });
 
       expect(instance.size).toBe(addValues.length);
 
-      removeValues.forEach((key, i) =>
-        popAndValidate(instance, key, expectedAfterRemovals[i])
-      );
+      removeValues.forEach((key, i) => {
+        const expectedKeys = expectedAfterRemovals[i];
+        expect(Array.isArray(expectedKeys)).toBe(true);
+        if (expectedKeys) {
+          popAndValidate(instance, key, expectedKeys);
+        }
+      });
 
       expect(isValidEmptyHeap(instance)).toBe(true);
     }
@@ -55,15 +63,23 @@ describe('Classes', () => {
       expect(isValidClassInstance(instanceType, instance)).toBe(true);
       expect(isValidEmptyHeap(instance)).toBe(true);
 
-      addValues.forEach((key, i) =>
-        addAndValidate(instance, key, expectedAfterAdditions[i])
-      );
+      addValues.forEach((key, i) => {
+        const expectedKeys = expectedAfterAdditions[i];
+        expect(Array.isArray(expectedKeys)).toBe(true);
+        if (expectedKeys) {
+          addAndValidate(instance, key, expectedKeys);
+        }
+      });
 
       expect(instance.size).toBe(addValues.length);
 
-      removeValues.forEach((key, i) =>
-        popAndValidate(instance, key, expectedAfterRemovals[i])
-      );
+      removeValues.forEach((key, i) => {
+        const expectedKeys = expectedAfterRemovals[i];
+        expect(Array.isArray(expectedKeys)).toBe(true);
+        if (expectedKeys) {
+          popAndValidate(instance, key, expectedKeys);
+        }
+      });
 
       expect(isValidEmptyHeap(instance)).toBe(true);
     }
@@ -80,9 +96,13 @@ describe('Classes', () => {
       expect(isValidClassInstance(instanceType, instance)).toBe(true);
       expect(isValidEmptyHeap(instance)).toBe(true);
 
-      addValues.forEach((num, i) =>
-        addAndValidate(instance, num, expectedAfterAdditions[i])
-      );
+      addValues.forEach((key, i) => {
+        const expectedKeys = expectedAfterAdditions[i];
+        expect(Array.isArray(expectedKeys)).toBe(true);
+        if (expectedKeys) {
+          addAndValidate(instance, key, expectedKeys);
+        }
+      });
 
       expect(instance.size).toBe(addValues.length);
 
@@ -116,9 +136,17 @@ describe('Classes', () => {
       expect(instance.remove({ key: 999 })).toBe(false); // Try to remove an invalid node.
       expect(instance.size).toBe(values.length);
 
-      removeNodesIndices.forEach((nodeIndex, i) =>
-        removeAndValidate(instance, nodes[nodeIndex], expectedAfterRemovals[i])
-      );
+      removeNodesIndices.forEach((nodeIndex, i) => {
+        const removeNode = nodes[nodeIndex];
+        const expectedKeys = expectedAfterRemovals[i];
+
+        expect(removeNode).not.toBe(undefined);
+        expect(Array.isArray(expectedKeys)).toBe(true);
+
+        if (removeNode && expectedKeys) {
+          removeAndValidate(instance, removeNode, expectedKeys);
+        }
+      });
 
       expect(isValidEmptyHeap(instance)).toBe(true);
     }
@@ -146,14 +174,22 @@ describe('Classes', () => {
         expect(node.key).toStrictEqual(expectedValuesOrder[i]);
       });
 
-      nodeIndexIncreaseValuePairs.forEach(([nodeIndex, increaseValue], i) =>
-        increaseAndValidate(
-          instance,
-          nodes[nodeIndex],
-          increaseValue,
-          expectedAfterIncreases[i]
-        )
-      );
+      nodeIndexIncreaseValuePairs.forEach(([nodeIndex, increaseValue], i) => {
+        const increaseNode = nodes[nodeIndex];
+        const expectedKeys = expectedAfterIncreases[i];
+
+        expect(increaseNode).not.toBe(undefined);
+        expect(Array.isArray(expectedKeys)).toBe(true);
+
+        if (increaseNode && expectedKeys) {
+          increaseAndValidate(
+            instance,
+            increaseNode,
+            increaseValue,
+            expectedKeys
+          );
+        }
+      });
 
       expect(instance.increase({ key: 999 }, 111)).toBe(false); // Try to increase the value of an invalid node.
 
@@ -183,14 +219,22 @@ describe('Classes', () => {
         expect(node.key).toStrictEqual(expectedValuesOrder[i]);
       });
 
-      nodeIndexDecreaseValuePairs.forEach(([nodeIndex, decreaseValue], i) =>
-        decreaseAndValidate(
-          instance,
-          nodes[nodeIndex],
-          decreaseValue,
-          expectedAfterDecreases[i]
-        )
-      );
+      nodeIndexDecreaseValuePairs.forEach(([nodeIndex, decreaseValue], i) => {
+        const decreaseNode = nodes[nodeIndex];
+        const expectedKeys = expectedAfterDecreases[i];
+
+        expect(decreaseNode).not.toBe(undefined);
+        expect(Array.isArray(expectedKeys)).toBe(true);
+
+        if (decreaseNode && expectedKeys) {
+          decreaseAndValidate(
+            instance,
+            decreaseNode,
+            decreaseValue,
+            expectedKeys
+          );
+        }
+      });
 
       expect(instance.decrease({ key: 999 }, 111)).toBe(false); // Try to decrease the value of an invalid node.
 

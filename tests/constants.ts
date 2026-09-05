@@ -156,7 +156,7 @@ export const TESTS_DATA = {
         [3, 2],
         [3, 7],
         [2, 10],
-      ],
+      ] as const,
       expectedAfterIncreases: [
         [9, 7, 6, 1, 4],
         [9, 8, 6, 1, 7],
@@ -176,7 +176,7 @@ export const TESTS_DATA = {
         [3, 2],
         [3, 7],
         [2, 10],
-      ],
+      ] as const,
       expectedAfterIncreases: [
         [1, 4, 6, 7, 9],
         [1, 7, 6, 8, 9],
@@ -198,7 +198,7 @@ export const TESTS_DATA = {
         [3, 2],
         [3, 7],
         [2, 10],
-      ],
+      ] as const,
       expectedAfterDecreases: [
         [9, 7, 6, 1, 4],
         [9, 7, 6, 1, 0],
@@ -218,7 +218,7 @@ export const TESTS_DATA = {
         [3, 2],
         [3, 7],
         [2, 10],
-      ],
+      ] as const,
       expectedAfterDecreases: [
         [1, 4, 6, 7, 9],
         [0, 1, 6, 7, 9],

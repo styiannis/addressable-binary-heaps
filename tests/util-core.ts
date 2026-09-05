@@ -13,21 +13,30 @@ function isValidHeap<A extends IHeapArray>(
   instanceType: 'max-heap' | 'min-heap',
   instance: A
 ) {
+  const stack = [0];
+
   let isValid = true;
 
-  const stack = [0];
   for (
     let index = stack.shift();
     isValid && index !== undefined;
     index = stack.shift()
   ) {
+    const parent = instance[index];
+
+    if (parent === undefined) {
+      continue;
+    }
+
     isValid = [getLeftChildIndex(index), getRightChildIndex(index)].reduce(
       (acc, curr) => {
-        if (acc && undefined !== instance[curr]) {
+        const child = instance[curr];
+
+        if (acc && child) {
           acc =
             'max-heap' === instanceType
-              ? instance[index].key >= instance[curr].key
-              : instance[index].key <= instance[curr].key;
+              ? parent.key >= child.key
+              : parent.key <= child.key;
 
           if (acc) {
             stack.push(curr);
