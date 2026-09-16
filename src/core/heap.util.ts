@@ -13,7 +13,7 @@ import { IHeapArray } from '../types';
  */
 export function buildHeap<H extends IHeapArray = IHeapArray>(
   instance: H,
-  initialNodes: H[0][] | Readonly<H[0][]>,
+  initialNodes: H[number][] | Readonly<H[number][]>,
   heapifyDown: (instance: H, index: number) => void
 ) {
   for (const [i, node] of initialNodes.entries()) {
@@ -73,8 +73,8 @@ export function swapHeapNodes<H extends IHeapArray = IHeapArray>(
   secondIndex: number
 ) {
   const node = instance[firstIndex];
-  instance[firstIndex] = instance[secondIndex] as H[0];
-  instance[secondIndex] = node as H[0];
+  instance[firstIndex] = instance[secondIndex] as H[number];
+  instance[secondIndex] = node as H[number];
   instance.indices.set(instance[firstIndex], firstIndex);
   instance.indices.set(instance[secondIndex], secondIndex);
 }

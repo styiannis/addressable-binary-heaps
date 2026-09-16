@@ -24,8 +24,12 @@ export function isValidObjectInstance(
   return Array.isArray(instance) && arraysEqual(props, ['indices', 'length']);
 }
 
+export function toCoreInstanceType(classInstanceType: 'MaxHeap' | 'MinHeap') {
+  return 'MinHeap' === classInstanceType ? 'min-heap' : 'max-heap';
+}
+
 export function isValidClassInstance(
-  instanceType: 'MaxHeap' | 'MinHeap',
+  classInstanceType: 'MaxHeap' | 'MinHeap',
   instance: unknown
 ) {
   if ('object' !== typeof instance) {
@@ -58,7 +62,7 @@ export function isValidClassInstance(
     return false;
   }
 
-  if ('MaxHeap' === instanceType) {
+  if ('MaxHeap' === classInstanceType) {
     return instance instanceof MaxHeap && proto === MaxHeap.prototype;
   }
 

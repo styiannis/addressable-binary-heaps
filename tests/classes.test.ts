@@ -1,6 +1,6 @@
 import { MaxHeap, MinHeap } from '../src';
 import { TESTS_DATA } from './constants';
-import { isValidHeap, isValidClassInstance } from './util';
+import { isValidHeap, isValidClassInstance, toCoreInstanceType } from './util';
 import {
   addAndValidate,
   decreaseAndValidate,
@@ -17,13 +17,13 @@ describe('Classes', () => {
   ])(
     '[%s] Create, add, peek, and pop (1)',
     (
-      instanceType,
+      classInstanceType,
       Heap,
       { addValues, removeValues, expectedAfterAdditions, expectedAfterRemovals }
     ) => {
       const instance = new Heap();
 
-      expect(isValidClassInstance(instanceType, instance)).toBe(true);
+      expect(isValidClassInstance(classInstanceType, instance)).toBe(true);
       expect(isValidEmptyHeap(instance)).toBe(true);
 
       addValues.forEach((key, i) => {
@@ -54,13 +54,13 @@ describe('Classes', () => {
   ])(
     '[%s] Create, add, peek, and pop (2)',
     (
-      instanceType,
+      classInstanceType,
       Heap,
       { addValues, removeValues, expectedAfterAdditions, expectedAfterRemovals }
     ) => {
       const instance = new Heap();
 
-      expect(isValidClassInstance(instanceType, instance)).toBe(true);
+      expect(isValidClassInstance(classInstanceType, instance)).toBe(true);
       expect(isValidEmptyHeap(instance)).toBe(true);
 
       addValues.forEach((key, i) => {
@@ -90,10 +90,10 @@ describe('Classes', () => {
     ['MinHeap' as const, MinHeap, TESTS_DATA.createAddClear.minHeap],
   ])(
     '[%s] Create, add and clear',
-    (instanceType, Heap, { addValues, expectedAfterAdditions }) => {
+    (classInstanceType, Heap, { addValues, expectedAfterAdditions }) => {
       const instance = new Heap();
 
-      expect(isValidClassInstance(instanceType, instance)).toBe(true);
+      expect(isValidClassInstance(classInstanceType, instance)).toBe(true);
       expect(isValidEmptyHeap(instance)).toBe(true);
 
       addValues.forEach((key, i) => {
@@ -113,25 +113,33 @@ describe('Classes', () => {
   );
 
   it.each([
-    ['max-heap' as const, MaxHeap],
-    ['min-heap' as const, MinHeap],
-  ])('[%s] Insertions with equal keys never swap', (instanceType, Heap) => {
-    const nodes = Array.from({ length: 6 }, (_, id) => ({ key: 1, id }));
-    const instance = new Heap();
+    ['MaxHeap' as const, MaxHeap],
+    ['MinHeap' as const, MinHeap],
+  ])(
+    '[%s] Insertions with equal keys never swap',
+    (classInstanceType, Heap) => {
+      const instanceType = toCoreInstanceType(classInstanceType);
 
-    nodes.forEach((node) => instance.add(node));
+      const nodes = Array.from({ length: 6 }, (_, id) => ({ key: 1, id }));
+      const instance = new Heap();
 
-    const entries = [...instance];
-    expect(isValidHeap(instanceType, entries)).toBe(true);
-    expect(entries.every((node, i) => node === nodes[i])).toBe(true);
-  });
+      nodes.forEach((node) => instance.add(node));
+
+      const entries = [...instance];
+
+      expect(isValidHeap(instanceType, entries)).toBe(true);
+      expect(entries.every((node, i) => node === nodes[i])).toBe(true);
+    }
+  );
 
   it.each([
-    ['max-heap' as const, MaxHeap],
-    ['min-heap' as const, MinHeap],
+    ['MaxHeap' as const, MaxHeap],
+    ['MinHeap' as const, MinHeap],
   ])(
     '[%s] Bulk construction with equal keys never swaps',
-    (instanceType, Heap) => {
+    (classInstanceType, Heap) => {
+      const instanceType = toCoreInstanceType(classInstanceType);
+
       const nodes = Array.from({ length: 7 }, (_, id) => ({ key: 1, id }));
       const instance = new Heap(nodes);
 
@@ -147,7 +155,7 @@ describe('Classes', () => {
   ])(
     '[%s] Remove',
     (
-      _instanceType,
+      _classInstanceType,
       Heap,
       { values, expectedInitial, removeNodesIndices, expectedAfterRemovals }
     ) => {
@@ -182,19 +190,11 @@ describe('Classes', () => {
   );
 
   it.each([
-    [
-      'max-heap' as const,
-      MaxHeap,
-      TESTS_DATA.removeRebalanceTowardRoot.maxHeap,
-    ],
-    [
-      'min-heap' as const,
-      MinHeap,
-      TESTS_DATA.removeRebalanceTowardRoot.minHeap,
-    ],
+    ['MaxHeap' as const, MaxHeap, TESTS_DATA.removeRebalanceTowardRoot.maxHeap],
+    ['MinHeap' as const, MinHeap, TESTS_DATA.removeRebalanceTowardRoot.minHeap],
   ])(
     '[%s] Remove rebalances toward the root when required',
-    (_instanceType, Heap, { values, expectedPopOrderDirection }) => {
+    (_classInstanceType, Heap, { values, expectedPopOrderDirection }) => {
       const nodes = values.map((key) => ({ key }));
       const instance = new Heap(nodes);
 
@@ -224,11 +224,11 @@ describe('Classes', () => {
   );
 
   it.each([
-    ['max-heap' as const, MaxHeap],
-    ['min-heap' as const, MinHeap],
+    ['MaxHeap' as const, MaxHeap],
+    ['MinHeap' as const, MinHeap],
   ])(
     '[%s] Remove clears the index when the target is the last element',
-    (_instanceType, Heap) => {
+    (_classInstanceType, Heap) => {
       const nodes = [10, 20, 30, 40, 50].map((key) => ({ key }));
       const instance = new Heap(nodes);
       const lastNode = instance.entries(true).next().value;
@@ -245,11 +245,11 @@ describe('Classes', () => {
   );
 
   it.each([
-    ['max-heap' as const, MaxHeap],
-    ['min-heap' as const, MinHeap],
+    ['MaxHeap' as const, MaxHeap],
+    ['MinHeap' as const, MinHeap],
   ])(
     '[%s] Pop on a single-element heap clears the index of the popped node',
-    (_instanceType, Heap) => {
+    (_classInstanceType, Heap) => {
       const node = { key: 1 };
       const instance = new Heap([node]);
 
@@ -266,7 +266,7 @@ describe('Classes', () => {
   ])(
     '[%s] Increase',
     (
-      _instanceType,
+      _classInstanceType,
       Heap,
       {
         values,
@@ -311,7 +311,7 @@ describe('Classes', () => {
   ])(
     '[%s] Decrease',
     (
-      _instanceType,
+      _classInstanceType,
       Heap,
       {
         values,
@@ -352,22 +352,24 @@ describe('Classes', () => {
 
   it.each([
     [
-      'max-heap' as const,
+      'MaxHeap' as const,
       MaxHeap,
       TESTS_DATA.increaseDecreaseNegativeAmount.maxHeap,
     ],
     [
-      'min-heap' as const,
+      'MinHeap' as const,
       MinHeap,
       TESTS_DATA.increaseDecreaseNegativeAmount.minHeap,
     ],
   ])(
     '[%s] Increase and decrease restore the heap property with a negative amount',
     (
-      instanceType,
+      classInstanceType,
       Heap,
       { values, increaseNodeIndex, decreaseNodeIndex, negativeAmount }
     ) => {
+      const instanceType = toCoreInstanceType(classInstanceType);
+
       const nodes = values.map((key) => ({ key }));
       const instance = new Heap(nodes);
 
@@ -401,70 +403,73 @@ describe('Classes', () => {
   describe.each([
     ['MaxHeap' as const, MaxHeap, TESTS_DATA.iterators.maxHeap],
     ['MinHeap' as const, MinHeap, TESTS_DATA.iterators.minHeap],
-  ])('[%s] Iterators', (_instanceType, Heap, { values, expectedInOrder }) => {
-    const expectedInReverseOrder = [...expectedInOrder].reverse();
+  ])(
+    '[%s] Iterators',
+    (_classInstanceType, Heap, { values, expectedInOrder }) => {
+      const expectedInReverseOrder = [...expectedInOrder].reverse();
 
-    let instance: MaxHeap | MinHeap;
+      let instance: MaxHeap | MinHeap;
 
-    beforeEach(() => {
-      instance = new Heap(values.map((key) => ({ key })));
-    });
-
-    afterEach(() => {
-      instance.clear();
-    });
-
-    it('Entries', () => {
-      const arr: number[] = [];
-
-      for (const entry of instance.entries()) {
-        arr.push(entry.key);
-      }
-
-      expect(arr).toStrictEqual(expectedInOrder);
-
-      arr.length = 0;
-
-      for (const entry of instance.entries(true)) {
-        arr.push(entry.key);
-      }
-
-      expect(arr).toStrictEqual(expectedInReverseOrder);
-    });
-
-    it('Keys', () => {
-      const arr: number[] = [];
-
-      for (const key of instance.keys()) {
-        arr.push(key);
-      }
-
-      expect(arr).toStrictEqual(expectedInOrder);
-
-      arr.length = 0;
-
-      for (const key of instance.keys(true)) {
-        arr.push(key);
-      }
-
-      expect(arr).toStrictEqual(expectedInReverseOrder);
-    });
-
-    it('For-each', () => {
-      instance.forEach(({ key }, index, heapInstance) => {
-        expect(key).toBe(expectedInOrder[index]);
-        expect(heapInstance).toStrictEqual(instance);
+      beforeEach(() => {
+        instance = new Heap(values.map((key) => ({ key })));
       });
-    });
 
-    it('For-of', () => {
-      const arr: number[] = [];
+      afterEach(() => {
+        instance.clear();
+      });
 
-      for (let { key } of instance) {
-        arr.push(key);
-      }
+      it('Entries', () => {
+        const arr: number[] = [];
 
-      expect(arr).toStrictEqual(expectedInOrder);
-    });
-  });
+        for (const entry of instance.entries()) {
+          arr.push(entry.key);
+        }
+
+        expect(arr).toStrictEqual(expectedInOrder);
+
+        arr.length = 0;
+
+        for (const entry of instance.entries(true)) {
+          arr.push(entry.key);
+        }
+
+        expect(arr).toStrictEqual(expectedInReverseOrder);
+      });
+
+      it('Keys', () => {
+        const arr: number[] = [];
+
+        for (const key of instance.keys()) {
+          arr.push(key);
+        }
+
+        expect(arr).toStrictEqual(expectedInOrder);
+
+        arr.length = 0;
+
+        for (const key of instance.keys(true)) {
+          arr.push(key);
+        }
+
+        expect(arr).toStrictEqual(expectedInReverseOrder);
+      });
+
+      it('For-each', () => {
+        instance.forEach(({ key }, index, heapInstance) => {
+          expect(key).toBe(expectedInOrder[index]);
+          expect(heapInstance).toStrictEqual(instance);
+        });
+      });
+
+      it('For-of', () => {
+        const arr: number[] = [];
+
+        for (let { key } of instance) {
+          arr.push(key);
+        }
+
+        expect(arr).toStrictEqual(expectedInOrder);
+      });
+    }
+  );
 });

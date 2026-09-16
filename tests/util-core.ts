@@ -50,7 +50,7 @@ export function popAndValidate<A extends IHeapArray>(
 export function removeAndValidate<A extends IHeapArray>(
   instanceType: 'max-heap' | 'min-heap',
   instance: A,
-  removeNode: A[0],
+  removeNode: A[number],
   expectedKeys: number[]
 ) {
   if ('max-heap' === instanceType) {
@@ -65,7 +65,7 @@ export function removeAndValidate<A extends IHeapArray>(
 export function increaseAndValidate<A extends IHeapArray>(
   instanceType: 'max-heap' | 'min-heap',
   instance: A,
-  increaseNode: A[0],
+  increaseNode: A[number],
   increaseValue: number,
   expectedKeys: number[]
 ) {
@@ -81,7 +81,7 @@ export function increaseAndValidate<A extends IHeapArray>(
 export function decreaseAndValidate<A extends IHeapArray>(
   instanceType: 'max-heap' | 'min-heap',
   instance: A,
-  decreaseNode: A[0],
+  decreaseNode: A[number],
   decreaseValue: number,
   expectedKeys: number[]
 ) {

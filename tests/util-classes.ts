@@ -29,7 +29,7 @@ export function popAndValidate<H extends MaxHeap | MinHeap>(
 
 export function removeAndValidate<H extends MaxHeap | MinHeap>(
   instance: H,
-  node: IHeapArray[0],
+  node: IHeapArray[number],
   expected: number[]
 ) {
   expect(instance.remove(node)).toBe(true);
@@ -38,7 +38,7 @@ export function removeAndValidate<H extends MaxHeap | MinHeap>(
 
 export function increaseAndValidate<H extends MaxHeap | MinHeap>(
   instance: H,
-  node: IHeapArray[0],
+  node: IHeapArray[number],
   increaseValue: number,
   expected: number[]
 ) {
@@ -48,7 +48,7 @@ export function increaseAndValidate<H extends MaxHeap | MinHeap>(
 
 export function decreaseAndValidate<H extends MaxHeap | MinHeap>(
   instance: H,
-  node: IHeapArray[0],
+  node: IHeapArray[number],
   decreaseValue: number,
   expected: number[]
 ) {
