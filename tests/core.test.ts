@@ -113,6 +113,33 @@ describe('Core', () => {
   );
 
   it.each([
+    ['max-heap' as const, maxHeap],
+    ['min-heap' as const, minHeap],
+  ])('[%s] Insertions with equal keys never swap', (instanceType, heap) => {
+    const nodes = Array.from({ length: 6 }, (_, id) => ({ key: 1, id }));
+    const instance = heap.create();
+
+    nodes.forEach((node) => heap.add(instance, node));
+
+    expect(isValidHeap(instanceType, instance)).toBe(true);
+    expect(instance.every((node, i) => node === nodes[i])).toBe(true);
+  });
+
+  it.each([
+    ['max-heap' as const, maxHeap],
+    ['min-heap' as const, minHeap],
+  ])(
+    '[%s] Bulk construction with equal keys never swaps',
+    (instanceType, heap) => {
+      const nodes = Array.from({ length: 7 }, (_, id) => ({ key: 1, id }));
+      const instance = heap.create(nodes);
+
+      expect(isValidHeap(instanceType, instance)).toBe(true);
+      expect(instance.every((node, i) => node === nodes[i])).toBe(true);
+    }
+  );
+
+  it.each([
     ['max-heap' as const, maxHeap, TESTS_DATA.remove.maxHeap],
     ['min-heap' as const, minHeap, TESTS_DATA.remove.minHeap],
   ])(

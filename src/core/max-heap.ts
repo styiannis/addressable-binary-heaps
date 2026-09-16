@@ -57,7 +57,7 @@ function heapifyUp<H extends IHeapArray>(instance: H, index: number) {
 
   if (
     instance[pi] === undefined ||
-    instance[pi].key > (instance[index] as H[0]).key
+    instance[pi].key >= (instance[index] as H[0]).key
   ) {
     return;
   }
