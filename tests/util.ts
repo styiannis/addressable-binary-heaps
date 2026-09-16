@@ -1,4 +1,5 @@
-import { AbstractHeap, MaxHeap, MinHeap } from '../src';
+import { AbstractHeap, IHeapNode, MaxHeap, MinHeap } from '../src';
+import { getLeftChildIndex, getRightChildIndex } from '../src/core/heap.util';
 
 const arraysEqual = (a: any[], b: any[]) =>
   a.length === b.length && a.every((val, i) => val === b[i]);
@@ -62,4 +63,47 @@ export function isValidClassInstance(
   }
 
   return instance instanceof MinHeap && proto === MinHeap.prototype;
+}
+
+export function isValidHeap<A extends IHeapNode[]>(
+  instanceType: 'max-heap' | 'min-heap',
+  instance: A
+) {
+  const stack = [0];
+
+  let isValid = true;
+
+  for (
+    let index = stack.shift();
+    isValid && index !== undefined;
+    index = stack.shift()
+  ) {
+    const parent = instance[index];
+
+    if (parent === undefined) {
+      continue;
+    }
+
+    isValid = [getLeftChildIndex(index), getRightChildIndex(index)].reduce(
+      (acc, curr) => {
+        const child = instance[curr];
+
+        if (acc && child) {
+          acc =
+            'max-heap' === instanceType
+              ? parent.key >= child.key
+              : parent.key <= child.key;
+
+          if (acc) {
+            stack.push(curr);
+          }
+        }
+
+        return acc;
+      },
+      isValid
+    );
+  }
+
+  return isValid;
 }

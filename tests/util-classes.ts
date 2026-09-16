@@ -1,6 +1,6 @@
 import { IHeapArray, MaxHeap, MinHeap } from '../src';
 
-function heapKeys(heap: IHeapArray | MaxHeap | MinHeap) {
+function heapKeys<H extends MaxHeap | MinHeap>(heap: H) {
   const keys: number[] = [];
   for (let node of heap) {
     keys.push(node.key);
@@ -8,8 +8,8 @@ function heapKeys(heap: IHeapArray | MaxHeap | MinHeap) {
   return keys;
 }
 
-export function addAndValidate(
-  instance: MaxHeap | MinHeap,
+export function addAndValidate<H extends MaxHeap | MinHeap>(
+  instance: H,
   key: number,
   expected: number[]
 ) {
@@ -17,8 +17,8 @@ export function addAndValidate(
   expect(heapKeys(instance)).toStrictEqual(expected);
 }
 
-export function popAndValidate(
-  instance: MaxHeap | MinHeap,
+export function popAndValidate<H extends MaxHeap | MinHeap>(
+  instance: H,
   key: number,
   expected: number[]
 ) {
@@ -27,8 +27,8 @@ export function popAndValidate(
   expect(heapKeys(instance)).toStrictEqual(expected);
 }
 
-export function removeAndValidate(
-  instance: MaxHeap | MinHeap,
+export function removeAndValidate<H extends MaxHeap | MinHeap>(
+  instance: H,
   node: IHeapArray[0],
   expected: number[]
 ) {
@@ -36,8 +36,8 @@ export function removeAndValidate(
   expect(heapKeys(instance)).toStrictEqual(expected);
 }
 
-export function increaseAndValidate(
-  instance: MaxHeap | MinHeap,
+export function increaseAndValidate<H extends MaxHeap | MinHeap>(
+  instance: H,
   node: IHeapArray[0],
   increaseValue: number,
   expected: number[]
@@ -46,8 +46,8 @@ export function increaseAndValidate(
   expect(heapKeys(instance)).toStrictEqual(expected);
 }
 
-export function decreaseAndValidate(
-  instance: MaxHeap | MinHeap,
+export function decreaseAndValidate<H extends MaxHeap | MinHeap>(
+  instance: H,
   node: IHeapArray[0],
   decreaseValue: number,
   expected: number[]
@@ -56,7 +56,7 @@ export function decreaseAndValidate(
   expect(heapKeys(instance)).toStrictEqual(expected);
 }
 
-export function isValidEmptyHeap(instance: MaxHeap | MinHeap) {
+export function isValidEmptyHeap<H extends MaxHeap | MinHeap>(instance: H) {
   return (
     0 === instance.size &&
     undefined === instance.peek() &&

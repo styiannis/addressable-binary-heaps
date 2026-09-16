@@ -239,6 +239,20 @@ export const TESTS_DATA = {
       ],
     },
   },
+  increaseDecreaseNegativeAmount: {
+    maxHeap: {
+      values: [10, 40, 5, 30, 2, 20, 15],
+      increaseNodeIndex: 3,
+      decreaseNodeIndex: 6,
+      negativeAmount: -1000,
+    },
+    minHeap: {
+      values: [10, 40, 5, 30, 2, 20, 15],
+      increaseNodeIndex: 3,
+      decreaseNodeIndex: 2,
+      negativeAmount: -1000,
+    },
+  },
   iterators: {
     maxHeap: {
       values: [8, 6, 5, 2, 9, 4, 1, 7, 3],

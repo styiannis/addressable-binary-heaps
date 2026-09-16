@@ -1,6 +1,6 @@
 import { maxHeap, minHeap } from '../src';
 import { TESTS_DATA } from './constants';
-import { isValidObjectInstance } from './util';
+import { isValidHeap, isValidObjectInstance } from './util';
 import {
   addAndValidate,
   decreaseAndValidate,
@@ -320,6 +320,54 @@ describe('Core', () => {
       expect(maxHeap.decrease(instance, { key: 999 }, 111)).toBe(false); // Try to decrease the value of an invalid node.
 
       heap.clear(instance);
+    }
+  );
+
+  it.each([
+    [
+      'max-heap' as const,
+      maxHeap,
+      TESTS_DATA.increaseDecreaseNegativeAmount.maxHeap,
+    ],
+    [
+      'min-heap' as const,
+      minHeap,
+      TESTS_DATA.increaseDecreaseNegativeAmount.minHeap,
+    ],
+  ])(
+    '[%s] Increase and decrease restore the heap property with a negative amount',
+    (
+      instanceType,
+      heap,
+      { values, increaseNodeIndex, decreaseNodeIndex, negativeAmount }
+    ) => {
+      const nodes = values.map((key) => ({ key }));
+      const instance = heap.create(nodes);
+
+      const extreme = () =>
+        'max-heap' === instanceType
+          ? nodes.reduce((a, b) => (a.key >= b.key ? a : b))
+          : nodes.reduce((a, b) => (a.key <= b.key ? a : b));
+
+      expect(nodes[increaseNodeIndex]).not.toBe(undefined);
+
+      if (nodes[increaseNodeIndex]) {
+        expect(
+          heap.increase(instance, nodes[increaseNodeIndex], negativeAmount)
+        ).toBe(true);
+        expect(isValidHeap(instanceType, instance)).toBe(true);
+        expect(heap.peek(instance)).toBe(extreme());
+      }
+
+      expect(nodes[decreaseNodeIndex]).not.toBe(undefined);
+
+      if (nodes[decreaseNodeIndex]) {
+        expect(
+          heap.decrease(instance, nodes[decreaseNodeIndex], negativeAmount)
+        ).toBe(true);
+        expect(isValidHeap(instanceType, instance)).toBe(true);
+        expect(heap.peek(instance)).toBe(extreme());
+      }
     }
   );
 

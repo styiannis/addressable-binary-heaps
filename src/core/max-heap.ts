@@ -199,7 +199,8 @@ export function remove<H extends IHeapArray>(instance: H, node: H[0]) {
 
 /**
  * Increases the key value of a heap element by a specified amount.
- * After increase, element may need to bubble up to maintain heap property.
+ * The element is rebalanced in whichever direction the new key requires,
+ * so a negative amount is handled the same as a positive one.
  *
  * @typeParam H - The type of max-heap array.
  * @param instance - The max-heap instance.
@@ -219,6 +220,7 @@ export function increase<H extends IHeapArray>(
   }
 
   node.key += increaseValue;
+  heapifyDown(instance, index);
   heapifyUp(instance, index);
 
   return true;
@@ -226,7 +228,8 @@ export function increase<H extends IHeapArray>(
 
 /**
  * Decreases the key value of a heap element by a specified amount.
- * After decrease, element may need to sink down to maintain heap property.
+ * The element is rebalanced in whichever direction the new key requires,
+ * so a negative amount is handled the same as a positive one.
  *
  * @typeParam H - The type of max-heap array.
  * @param instance - The max-heap instance.
@@ -247,6 +250,7 @@ export function decrease<H extends IHeapArray>(
 
   node.key -= decreaseValue;
   heapifyDown(instance, index);
+  heapifyUp(instance, index);
 
   return true;
 }

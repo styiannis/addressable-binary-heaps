@@ -1,55 +1,12 @@
 import { IHeapArray, maxHeap, minHeap } from '../src';
-import { getLeftChildIndex, getRightChildIndex } from '../src/core/heap.util';
-import { isValidObjectInstance } from './util';
+import { isValidHeap, isValidObjectInstance } from './util';
 
 function heapKeys<A extends IHeapArray>(heap: A) {
-  return heap.reduce((acc, { key }) => {
-    acc.push(key);
-    return acc;
-  }, [] as number[]);
-}
-
-function isValidHeap<A extends IHeapArray>(
-  instanceType: 'max-heap' | 'min-heap',
-  instance: A
-) {
-  const stack = [0];
-
-  let isValid = true;
-
-  for (
-    let index = stack.shift();
-    isValid && index !== undefined;
-    index = stack.shift()
-  ) {
-    const parent = instance[index];
-
-    if (parent === undefined) {
-      continue;
-    }
-
-    isValid = [getLeftChildIndex(index), getRightChildIndex(index)].reduce(
-      (acc, curr) => {
-        const child = instance[curr];
-
-        if (acc && child) {
-          acc =
-            'max-heap' === instanceType
-              ? parent.key >= child.key
-              : parent.key <= child.key;
-
-          if (acc) {
-            stack.push(curr);
-          }
-        }
-
-        return acc;
-      },
-      isValid
-    );
+  const keys: number[] = [];
+  for (let node of heap) {
+    keys.push(node.key);
   }
-
-  return isValid;
+  return keys;
 }
 
 export function addAndValidate<A extends IHeapArray>(
