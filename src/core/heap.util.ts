@@ -1,6 +1,32 @@
 import { IHeapArray } from '../types';
 
 /**
+ * Populates a heap instance from an array of nodes using Floyd's bottom-up
+ * heapify: fills the array and index map in one pass, then sifts down from
+ * the last parent to the root. Runs in `O(n)`, versus the `O(n log n)` of
+ * inserting the same nodes one at a time.
+ *
+ * @typeParam H - The type of heap array.
+ * @param instance - The empty heap instance to populate.
+ * @param initialNodes - Array of unsorted heap elements to build from.
+ * @param heapifyDown - The heap-specific (min or max) sift-down function.
+ */
+export function buildHeap<H extends IHeapArray = IHeapArray>(
+  instance: H,
+  initialNodes: H[0][] | Readonly<H[0][]>,
+  heapifyDown: (instance: H, index: number) => void
+) {
+  for (const [i, node] of initialNodes.entries()) {
+    instance.indices.set(node, i);
+    instance.push(node);
+  }
+
+  for (let i = Math.floor(instance.length / 2) - 1; i >= 0; i--) {
+    heapifyDown(instance, i);
+  }
+}
+
+/**
  * Returns the index of the parent of a heap array element.
  * In a binary heap, parent index is calculated as `floor((i-1)/2)`.
  *

@@ -1,6 +1,7 @@
 import { IHeapArray } from '../types';
 import * as heap from './heap';
 import {
+  buildHeap,
   getLeftChildIndex,
   getParentIndex,
   getRightChildIndex,
@@ -83,9 +84,7 @@ export function create<H extends IHeapArray>(
   instance.indices = new WeakMap();
 
   if (initialNodes) {
-    for (const node of initialNodes) {
-      add(instance, node);
-    }
+    buildHeap(instance, initialNodes, heapifyDown);
   }
 
   return instance;

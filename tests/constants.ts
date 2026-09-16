@@ -246,7 +246,7 @@ export const TESTS_DATA = {
     },
     minHeap: {
       values: [8, 6, 5, 2, 9, 4, 1, 7, 3],
-      expectedInOrder: [1, 3, 2, 5, 9, 6, 4, 8, 7],
+      expectedInOrder: [1, 2, 4, 3, 9, 8, 5, 7, 6],
     },
   },
 };
