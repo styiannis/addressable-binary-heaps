@@ -145,6 +145,16 @@ export const TESTS_DATA = {
       ],
     },
   },
+  removeRebalanceTowardRoot: {
+    maxHeap: {
+      values: [50, 20, 40, 38, 39, 36, 48],
+      expectedPopOrderDirection: -1,
+    },
+    minHeap: {
+      values: [0, 30, 10, 12, 11, 14, 2],
+      expectedPopOrderDirection: 1,
+    },
+  },
   increase: {
     maxHeap: {
       values: [4, 7, 6, 1, 9],

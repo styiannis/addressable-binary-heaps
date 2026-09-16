@@ -153,6 +153,85 @@ describe('Core', () => {
   );
 
   it.each([
+    [
+      'max-heap' as const,
+      maxHeap,
+      TESTS_DATA.removeRebalanceTowardRoot.maxHeap,
+    ],
+    [
+      'min-heap' as const,
+      minHeap,
+      TESTS_DATA.removeRebalanceTowardRoot.minHeap,
+    ],
+  ])(
+    '[%s] Remove rebalances toward the root when required',
+    (_instanceType, heap, { values, expectedPopOrderDirection }) => {
+      const nodes = values.map((key) => ({ key }));
+      const instance = heap.create(nodes);
+
+      const removeNode = nodes[1];
+
+      expect(removeNode).not.toBe(undefined);
+
+      if (removeNode) {
+        expect(heap.remove(instance, removeNode)).toBe(true);
+      }
+
+      const popped: number[] = [];
+
+      for (let node = heap.pop(instance); node; node = heap.pop(instance)) {
+        popped.push(node.key);
+      }
+
+      expect(popped.length).toBe(values.length - 1);
+
+      popped.reduce((prev, curr) => {
+        expect(
+          expectedPopOrderDirection * (curr - prev)
+        ).toBeGreaterThanOrEqual(0);
+        return curr;
+      });
+    }
+  );
+
+  it.each([
+    ['max-heap' as const, maxHeap],
+    ['min-heap' as const, minHeap],
+  ])(
+    '[%s] Remove clears the index when the target is the last element',
+    (_instanceType, heap) => {
+      const nodes = [10, 20, 30, 40, 50].map((key) => ({ key }));
+      const instance = heap.create(nodes);
+      const lastNode = instance.at(-1);
+
+      expect(lastNode).not.toBe(undefined);
+
+      if (lastNode) {
+        expect(heap.remove(instance, lastNode)).toBe(true);
+
+        expect(heap.increase(instance, lastNode, 1)).toBe(false);
+        expect(heap.decrease(instance, lastNode, 1)).toBe(false);
+      }
+    }
+  );
+
+  it.each([
+    ['max-heap' as const, maxHeap],
+    ['min-heap' as const, minHeap],
+  ])(
+    '[%s] Pop on a single-element heap clears the index of the popped node',
+    (_instanceType, heap) => {
+      const node = { key: 1 };
+      const instance = heap.create([node]);
+
+      expect(heap.pop(instance)).toBe(node);
+
+      expect(heap.increase(instance, node, 1)).toBe(false);
+      expect(heap.decrease(instance, node, 1)).toBe(false);
+    }
+  );
+
+  it.each([
     ['max-heap' as const, maxHeap, TESTS_DATA.increase.maxHeap],
     ['min-heap' as const, minHeap, TESTS_DATA.increase.minHeap],
   ])(
