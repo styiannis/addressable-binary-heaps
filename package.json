@@ -1,24 +1,29 @@
 {
   "name": "addressable-binary-heaps",
   "version": "1.1.0",
-  "description": "A versatile TypeScript library for addressable binary heaps, delivering optimized and scalable min-heap and max-heap implementations, seamlessly supporting both object-oriented and functional paradigms.",
+  "description": "Addressable min-heap and max-heap for TypeScript, where your objects are the elements and reprioritising or removing one costs no search.",
   "keywords": [
-    "data structures",
-    "binary heap",
-    "binary heaps",
+    "priority queue",
+    "indexed priority queue",
+    "addressable",
     "heap",
-    "heaps",
+    "binary heap",
+    "min heap",
     "max heap",
-    "min heap"
+    "decrease-key",
+    "increase-key",
+    "data structures",
+    "typescript"
   ],
   "author": "Yiannis Stergiou <hello@styiannis.dev>",
   "license": "MIT",
+  "homepage": "https://github.com/styiannis/addressable-binary-heaps/",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/styiannis/addressable-binary-heaps.git"
   },
   "bugs": {
-    "url": "https://github.com/styiannis/addressable-binary-heaps.git"
+    "url": "https://github.com/styiannis/addressable-binary-heaps/issues"
   },
   "type": "commonjs",
   "source": "src/index.ts",
@@ -71,9 +76,9 @@
     "@rollup/plugin-typescript": "^12.3.0",
     "@types/jest": "^30.0.0",
     "jest": "^30.5.1",
-    "oxlint": "^1.81.0",
-    "prettier": "^3.9.6",
-    "rollup": "^4.63.1",
+    "oxlint": "^1.83.0",
+    "prettier": "^3.9.7",
+    "rollup": "^4.63.3",
     "rollup-plugin-dts": "^6.5.1",
     "ts-jest": "^29.4.12",
     "tslib": "^2.8.1",
