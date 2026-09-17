@@ -3,7 +3,7 @@
 From an empty project to a priority queue you can add to, take from, reorder
 while it is full, and cancel out of.
 
-**Last verified:** 2026-09-16 · v1.1.1 · Node ≥ 18.12
+**Last verified:** 2026-09-18 · v1.2.0 · Node ≥ 18.12
 
 ## Install
 

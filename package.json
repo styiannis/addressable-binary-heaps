@@ -1,6 +1,6 @@
 {
   "name": "addressable-binary-heaps",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Addressable min-heap and max-heap for TypeScript, where your objects are the elements and reprioritising or removing one costs no search.",
   "keywords": [
     "priority queue",
@@ -17,7 +17,7 @@
   ],
   "author": "Yiannis Stergiou <hello@styiannis.dev>",
   "license": "MIT",
-  "homepage": "https://github.com/styiannis/addressable-binary-heaps/",
+  "homepage": "https://github.com/styiannis/addressable-binary-heaps",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/styiannis/addressable-binary-heaps.git"

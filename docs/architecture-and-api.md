@@ -1,6 +1,6 @@
 # Architecture and API
 
-**Last verified:** 2026-09-16 · v1.1.1
+**Last verified:** 2026-09-18 · v1.2.0
 
 ## One numeric field as the whole contract
 
