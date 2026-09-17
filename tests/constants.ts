@@ -117,6 +117,36 @@ export const TESTS_DATA = {
       ],
     },
   },
+  infiniteKeys: {
+    maxHeap: {
+      values: [50, 40, 30, 20, 10, 5, 1],
+      expectedPopOrderWithInfinities: [
+        Infinity,
+        50,
+        40,
+        30,
+        20,
+        10,
+        5,
+        1,
+        -Infinity,
+      ],
+    },
+    minHeap: {
+      values: [50, 40, 30, 20, 10, 5, 1],
+      expectedPopOrderWithInfinities: [
+        -Infinity,
+        1,
+        5,
+        10,
+        20,
+        30,
+        40,
+        50,
+        Infinity,
+      ],
+    },
+  },
   remove: {
     maxHeap: {
       values: [4, 7, 6, 1, 9, 3],

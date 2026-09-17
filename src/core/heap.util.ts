@@ -2,14 +2,14 @@ import { IHeapArray } from '../types';
 
 /**
  * Populates a heap instance from an array of nodes using Floyd's bottom-up
- * heapify: fills the array and index map in one pass, then sifts down from
- * the last parent to the root. Runs in `O(n)`, versus the `O(n log n)` of
+ * heapify: fills the array and index map in one pass, then heapifies down
+ * from the last parent to the root. Runs in `O(n)`, versus the `O(n log n)` of
  * inserting the same nodes one at a time.
  *
  * @typeParam H - The type of heap array.
  * @param instance - The empty heap instance to populate.
  * @param initialNodes - Array of unsorted heap elements to build from.
- * @param heapifyDown - The heap-specific (min or max) sift-down function.
+ * @param heapifyDown - The heap-specific (min or max) heapify-down function.
  */
 export function buildHeap<H extends IHeapArray = IHeapArray>(
   instance: H,

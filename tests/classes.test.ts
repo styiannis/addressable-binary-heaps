@@ -150,6 +150,30 @@ describe('Classes', () => {
   );
 
   it.each([
+    ['MaxHeap' as const, MaxHeap, TESTS_DATA.infiniteKeys.maxHeap],
+    ['MinHeap' as const, MinHeap, TESTS_DATA.infiniteKeys.minHeap],
+  ])(
+    '[%s] Infinities are ordered like any other key',
+    (classInstanceType, Heap, { values, expectedPopOrderWithInfinities }) => {
+      const instanceType = toCoreInstanceType(classInstanceType);
+
+      const instance = new Heap(
+        [...values, Infinity, -Infinity].map((key) => ({ key }))
+      );
+
+      expect(isValidHeap(instanceType, [...instance])).toBe(true);
+
+      const keys: number[] = [];
+
+      for (let node = instance.pop(); node; node = instance.pop()) {
+        keys.push(node.key);
+      }
+
+      expect(keys).toStrictEqual(expectedPopOrderWithInfinities);
+    }
+  );
+
+  it.each([
     ['MaxHeap' as const, MaxHeap, TESTS_DATA.remove.maxHeap],
     ['MinHeap' as const, MinHeap, TESTS_DATA.remove.minHeap],
   ])(

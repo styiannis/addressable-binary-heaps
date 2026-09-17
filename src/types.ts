@@ -7,6 +7,10 @@ export interface IHeapNode {
    * The numeric key value used for heap ordering.
    * - Lower values have higher priority in a min-heap,
    * - higher values have higher priority in a max-heap.
+   *
+   * Expected to be a finite number. Nothing validates this: a key is only
+   * ever compared with `<`, `>`, `<=` and `>=`, so one of another type is
+   * ordered by whatever those return for it, and a `NaN` by nothing at all.
    */
   key: number;
 }

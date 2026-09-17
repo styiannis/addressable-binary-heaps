@@ -114,7 +114,7 @@ export function size<H extends IHeapArray>(instance: H) {
 
 /**
  * Adds a new element to the max-heap while maintaining the heap property.
- * The element is initially added at the end and then bubbled up as needed.
+ * The element is initially added at the end and then heapified up as needed.
  *
  * @typeParam H - The type of max-heap array.
  * @param instance - The max-heap instance.

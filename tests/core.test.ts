@@ -140,6 +140,28 @@ describe('Core', () => {
   );
 
   it.each([
+    ['max-heap' as const, maxHeap, TESTS_DATA.infiniteKeys.maxHeap],
+    ['min-heap' as const, minHeap, TESTS_DATA.infiniteKeys.minHeap],
+  ])(
+    '[%s] Infinities are ordered like any other key',
+    (instanceType, heap, { values, expectedPopOrderWithInfinities }) => {
+      const instance = heap.create(
+        [...values, Infinity, -Infinity].map((key) => ({ key }))
+      );
+
+      expect(isValidHeap(instanceType, instance)).toBe(true);
+
+      const keys: number[] = [];
+
+      for (let node = heap.pop(instance); node; node = heap.pop(instance)) {
+        keys.push(node.key);
+      }
+
+      expect(keys).toStrictEqual(expectedPopOrderWithInfinities);
+    }
+  );
+
+  it.each([
     ['max-heap' as const, maxHeap, TESTS_DATA.remove.maxHeap],
     ['min-heap' as const, minHeap, TESTS_DATA.remove.minHeap],
   ])(
