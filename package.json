@@ -1,7 +1,7 @@
 {
   "name": "addressable-binary-heaps",
   "version": "1.2.0",
-  "description": "Addressable min-heap and max-heap for TypeScript, where your objects are the elements and reprioritising or removing one costs no search.",
+  "description": "Addressable min-heaps and max-heaps for TypeScript: any object with a numeric key is an element, and the heap always knows where it sits.",
   "keywords": [
     "priority queue",
     "indexed priority queue",

@@ -3,7 +3,7 @@
 From an empty project to a priority queue you can add to, take from, reorder
 while it is full, and cancel out of.
 
-**Last verified:** 2026-09-18 · v1.2.0 · Node ≥ 18.12
+**Last verified:** 2026-09-19 · v1.2.0 · Node ≥ 18.12
 
 ## Install
 
@@ -81,9 +81,9 @@ not matter; the order they leave in is priority order.
 
 ## Change a priority while the element is queued
 
-This is the operation the structure exists for. A scheduler learns that a
-queued job became urgent, and the job object is something you are still
-holding, so no search is needed to find its position:
+The element is something you are still holding, so changing its priority does
+not begin with a search for it. A scheduler learns that a queued job became
+urgent:
 
 ```typescript
 import { MinHeap } from 'addressable-binary-heaps';
@@ -119,7 +119,7 @@ console.log(queue.decrease(new Task('stranger', 0), 1)); // false
 `decrease` subtracts the amount from `key` and moves the element to wherever
 that new key belongs; `increase` adds and does the same in the other
 direction. Both take the element, not an index or a handle, and both return
-`false` if the heap has never seen it, as the last call above shows for an
+`false` if the heap does not hold it, as the last call above shows for an
 element that was never added.
 
 ## Cancel an element from anywhere
@@ -153,10 +153,10 @@ an element you are not sure is still queued.
 
 ## Iterate, knowing what the order is
 
-A heap is iterable, and the order is the one thing about it that surprises
-people. A binary heap is stored as an array in which every element precedes
-its children, which is weaker than sorted: the top is guaranteed, the rest is
-not.
+A heap is iterable, and the order it iterates in is not necessarily the order
+elements leave it in. A binary heap is stored as an array in which every
+element precedes its children, which is weaker than sorted: the top is
+guaranteed, the rest is not.
 
 ```typescript
 import { MinHeap } from 'addressable-binary-heaps';

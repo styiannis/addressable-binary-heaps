@@ -6,7 +6,8 @@
 Min-heaps and max-heaps for TypeScript in which **your object is the element**.
 The heap keeps track of where every element sits, so raising or lowering an
 element's priority, or taking it out of the queue entirely, never begins with a
-search for it.
+search for it, whether you use the classes or the plain functions they are
+built on.
 
 ## Install
 
@@ -91,8 +92,10 @@ console.log(alerts.pop()?.name, alerts.pop()?.name); // disk network
 Both operations reach the element through a `WeakMap` from element to array
 index, which the heap maintains through every swap. A heap without that map has
 to scan its array before it can act on a given element, and an array kept sorted
-has to shift everything past the position that changed; the distance between
-those and this one grows with the size of the structure.
+has to shift everything past the position that changed. The gap between those
+two and this heap grows with the size of the structure.
+[The architecture write-up](https://github.com/styiannis/addressable-binary-heaps/blob/main/docs/architecture-and-api.md#what-the-addressing-costs)
+measures all three, along with what the map itself costs.
 
 ## The same heaps as plain functions
 
@@ -178,7 +181,7 @@ iteration follows the underlying array, and array order in a heap is not
 priority order.
 
 Nothing in the library throws. A call that cannot find its element returns
-`false`, and a call on an empty heap returns `undefined`.
+`false`, and `peek` or `pop` on an empty heap returns `undefined`.
 
 ## When not to use it
 
@@ -189,7 +192,7 @@ every insertion. What follows are the cases where nothing is bought with it.
 | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | Only `add` and `pop`; priorities never move        | a binary heap without addressing — the index map would be paid for and never used                                                              |
 | The whole order, once, over a set already complete | `Array.prototype.sort`, which is both faster here and the shorter program                                                                      |
-| Ordering by something other than a number          | a heap that takes a comparator — `key` is typed `number` and compared with `<` and `>`, and there is no comparator parameter                   |
+| Ordering by something other than a number          | a heap that takes a comparator — `key` is typed `number` and compared with `<`, `>`, `<=` and `>=`, and there is no comparator parameter       |
 | Frequent membership tests                          | a `Set` maintained beside the heap — there is no `has`, and a `false` from `remove`, `increase` or `decrease` is the only signal the API gives |
 | One element queued in two structures at once       | a separate object per structure — `increase` and `decrease` write to `node.key`, and the other heap is never told it changed                   |
 

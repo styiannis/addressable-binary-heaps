@@ -1,6 +1,6 @@
 # Architecture and API
 
-**Last verified:** 2026-09-18 · v1.2.0
+**Last verified:** 2026-09-19 · v1.2.0
 
 ## One numeric field as the whole contract
 
@@ -29,10 +29,11 @@ export type IHeapArray<N extends IHeapNode = IHeapNode> = Array<N> & {
 
 The heap is an array with a map from element to its current position, and
 `swapHeapNodes` maintains that map on every exchange. This is what
-_addressable_ names. A textbook binary heap can only remove from the top,
-because that is the only position it knows; given the map, `remove`,
-`increase` and `decrease` take an element and reach its position in `O(1)`,
-leaving the `O(log n)` rebalance as the whole cost of the operation.
+_addressable_ names. A textbook binary heap has no way to find an element it
+is handed: the only position it knows is the top, and reaching any other one
+means scanning for it. Given the map, `remove`, `increase` and `decrease` take
+an element and reach its position in `O(1)`, leaving the `O(log n)` rebalance
+as the whole cost of the operation.
 
 ## What the addressing costs
 
@@ -42,9 +43,9 @@ For one million elements, each an object carrying an id and a key, the objects
 alone retain 61.0 MB in an `Array`. Adding them to a `MinHeap` — the array and
 the map, with the objects still held separately so only the heap's own
 overhead is counted — brings the total to 103.0 MB. The heap therefore costs
-44.0 bytes per element, and the two structures it adds account for all of it:
-about 10.4 bytes for the array slot — a heap array is grown by `push`, so it
-carries the allocator's spare capacity — and 33.6 for the `WeakMap` entry.
+44.0 bytes per element, and the two structures it adds account for all of it.
+The `WeakMap` entry takes 33.6 bytes and the array slot about 10.4, because a
+heap array is grown by `push` and carries the allocator's spare capacity.
 
 Insertion pays the same map. Adding 100,000 elements took 33.0 ms in one
 measured run, against 23.1 ms for the same binary heap written without the
@@ -72,10 +73,10 @@ rather than a convention.
 
 `core/` is written as small independent functions over plain objects, each
 one short enough that what happens inside it can be read off the page, **and
-so can the resources it requires**.
-`minHeap.remove` fits on one screen, and the reason it is `O(log n)` is
-visible in it: one `indices.get` locates the element, and the two `heapify`
-calls that follow are the only work that depends on the size of the heap.
+so can the resources it requires**. `minHeap.remove` fits on one screen, and
+the reason it is `O(log n)` is visible in it: one `indices.get` locates the
+element, and the two `heapify` calls that follow are the only work that
+depends on the size of the heap.
 
 ```
 src/
@@ -98,10 +99,10 @@ file itself. What they genuinely share — `clear`, `size`, `peek`, `entries`,
 is not duplicated.
 
 The `classes/` layer contains no algorithm. `MinHeap.pop` is
-`return minHeap.pop(this.#heap)`; every method is that shape. What the layer
-adds is the generic parameter that carries your element type through the API,
-the `Symbol.iterator` implementation, `forEach`, and prototypes for code that
-prefers them.
+`return minHeap.pop(this.#heap)`, and every method but `forEach` has that
+shape. What the layer adds is the generic parameter that carries your element
+type through the API, the `Symbol.iterator` implementation, `forEach`, and
+prototypes for code that prefers them.
 
 Unlike the array it wraps, a class instance is not itself an `IHeapArray`: the
 heap is held in a `#heap` private field, so the core functions cannot be
@@ -152,11 +153,12 @@ linear scan in a heap without the map.
 heapifies down from the last parent (`⌊n/2⌋ - 1`) to the root. `O(log n)` per
 insertion would cost `O(n log n)` over the whole array.
 
-`remove` is also the operation whose implementation is least obvious. It swaps
-the element with the last position, pops it, and then heapifies the replacement
-**in both directions**: an element promoted from the end of the array may
-belong above its new parent as easily as below its new children, and only one
-of the two calls ever does work.
+`remove` is also the operation whose implementation is least obvious. An
+element that is already the last one is popped outright. Any other is swapped
+with the last position, popped from there, and the replacement left behind is
+heapified **in both directions**: an element promoted from the end of the array
+may belong above its new parent as easily as below its new children, and only
+one of the two calls ever does work.
 
 Iteration deserves its own line because the notation hides the surprise:
 `entries` and `keys` are `O(n)` over the underlying array, and array order in
@@ -235,9 +237,9 @@ build, and a declaration tree for each of them. All four run with
 label their output by extension — `.mjs` and `.d.mts` on the ES side, `.cjs`
 and `.d.cts` on the CommonJS side.
 
-Two scripts then check that result. `check-declared-paths` takes every path
-declared in `package.json` and verifies that it exists in the build and
-carries the extension its condition implies. `check-dist-loads` loads each
-built entry the way a consumer would, one with `require` and one with
-`import`. Jest covers both layers, and `npm run verify` runs the type check,
-the linter, the build and both checks in sequence.
+Two scripts check the result. `check-declared-paths` verifies that every path
+`package.json` declares exists, and that each entry point carries the extension
+of the module system it is declared for; `check-dist-loads` loads the two built
+entries the way a consumer would, the CommonJS one with `require` and the ES
+one with `import`. Jest covers both layers, and `npm run verify` runs the type
+check, the linter, the build and both checks in sequence.

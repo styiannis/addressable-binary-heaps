@@ -3,7 +3,7 @@
 Behaviour that surprises readers of the API, what the library does instead of
 throwing, and the questions the package shape raises.
 
-**Last verified:** 2026-09-18 · v1.2.0
+**Last verified:** 2026-09-19 · v1.2.0
 
 ## Behaviour
 
@@ -402,14 +402,14 @@ Nothing in `src/` throws. There is no validation layer and no `TypeError` to
 catch, which keeps each operation to the comparisons and swaps it describes
 and makes misuse silent rather than loud. These are the cases worth knowing:
 
-| Call                                                    | Result                                                                                                                |
-| ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `peek()` / `pop()` on an empty heap                     | `undefined`                                                                                                           |
-| `remove(node)` for an element the heap does not hold    | `false`; the heap is unchanged                                                                                        |
-| `increase` / `decrease` for an element it does not hold | `false`; `key` is **not** modified                                                                                    |
-| the same object added twice                             | two positions share one recorded index; an update reaches one of them                                                 |
-| `node.key` assigned directly                            | nothing moves                                                                                                         |
-| a `key` that is not a finite number                     | ordered by whatever `<` and `>` do with it — for `NaN` they return `false` every time, leaving its position undefined |
+| Call                                                    | Result                                                                                                                            |
+| ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `peek()` / `pop()` on an empty heap                     | `undefined`                                                                                                                       |
+| `remove(node)` for an element the heap does not hold    | `false`; the heap is unchanged                                                                                                    |
+| `increase` / `decrease` for an element it does not hold | `false`; `key` is **not** modified                                                                                                |
+| the same object added twice                             | two positions share one recorded index; an update reaches one of them                                                             |
+| `node.key` assigned directly                            | nothing moves                                                                                                                     |
+| a `key` that is not a finite number                     | ordered by whatever `<`, `>`, `<=` and `>=` do with it — for `NaN` they return `false` every time, leaving its position undefined |
 
 The duplicated object is the one that costs correctness: it leaves a
 structurally valid heap whose top is wrong. The rest report failure through
@@ -470,6 +470,4 @@ Nothing. `dependencies` and `peerDependencies` are both absent from
 
 ### What are the version requirements?
 
-`engines` declares Node ≥ 18.12 and npm ≥ 8. The published JavaScript targets
-ES2022. TypeScript users need a version that understands the `exports` field —
-4.7 or later with `moduleResolution` set to `node16`, `nodenext` or `bundler`.
+Node 18.12 or later, and npm 8 or later. The published code targets ES2022.
