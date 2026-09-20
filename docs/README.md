@@ -1,14 +1,10 @@
-# addressable-binary-heaps documentation
+# Addressable Binary Heaps - Documentation
 
-**Last verified:** 2026-09-18 · v1.2.0
+| Document                                        | The question it answers                          |
+| ----------------------------------------------- | ------------------------------------------------ |
+| [Getting started](getting-started.md)           | How do I install it and get a working heap?      |
+| [FAQ](faq.md)                                   | It did something I did not expect — why?         |
+| [Architecture and API](architecture-and-api.md) | How is the library built, and what can I extend? |
 
-| Document                                           | The question it answers                          |
-| -------------------------------------------------- | ------------------------------------------------ |
-| [getting-started.md](getting-started.md)           | How do I install it and get a working heap?      |
-| [faq.md](faq.md)                                   | It did something I did not expect — why?         |
-| [architecture-and-api.md](architecture-and-api.md) | How is the library built, and what can I extend? |
-
-The generated API reference — every signature, every type — is at
-[styiannis.github.io/addressable-binary-heaps](https://styiannis.github.io/addressable-binary-heaps/).
-The [README](../README.md) is the summary; nothing here is required reading to
-understand it.
+The generated [API reference](https://styiannis.github.io/addressable-binary-heaps/)
+lists every signature and every type.

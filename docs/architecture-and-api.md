@@ -1,6 +1,6 @@
 # Architecture and API
 
-**Last verified:** 2026-09-19 · v1.2.0
+**Last verified:** 2026-09-21 · v1.2.0
 
 ## One numeric field as the whole contract
 
@@ -40,9 +40,9 @@ as the whole cost of the operation.
 It costs memory and insertion time, both measurable.
 
 For one million elements, each an object carrying an id and a key, the objects
-alone retain 61.0 MB in an `Array`. Adding them to a `MinHeap` — the array and
+alone retain 64.0 MB in an `Array`. Adding them to a `MinHeap` — the array and
 the map, with the objects still held separately so only the heap's own
-overhead is counted — brings the total to 103.0 MB. The heap therefore costs
+overhead is counted — brings the total to 108.0 MB. The heap therefore costs
 44.0 bytes per element, and the two structures it adds account for all of it.
 The `WeakMap` entry takes 33.6 bytes and the array slot about 10.4, because a
 heap array is grown by `push` and carries the allocator's spare capacity.
@@ -74,8 +74,9 @@ rather than a convention.
 `core/` is written as small independent functions over plain objects, each
 one short enough that what happens inside it can be read off the page, **and
 so can the resources it requires**. `minHeap.remove` fits on one screen, and
-the reason it is `O(log n)` is visible in it: one `indices.get` locates the
-element, and the two `heapify` calls that follow are the only work that
+the reason it is `O(log n)` is visible in it: an element already at the end of
+the array is popped outright, and any other costs one `indices.get` to locate
+it plus the two `heapify` calls that follow, which are the only work that
 depends on the size of the heap.
 
 ```
@@ -92,9 +93,10 @@ src/
 ```
 
 `min-heap.ts` and `max-heap.ts` are deliberate near-duplicates rather than one
-parameterised module: the two `heapify` helpers differ by a comparison
-operator, and inlining that difference keeps each file's cost readable in the
-file itself. What they genuinely share — `clear`, `size`, `peek`, `entries`,
+parameterised module: the two `heapify` helpers differ only in their
+comparison operators — `<` against `>` to choose the child to descend into,
+`<=` against `>=` to stop — and inlining that difference keeps each file's
+cost readable in the file itself. What they genuinely share — `clear`, `size`, `peek`, `entries`,
 `keys`, and the index arithmetic — lives in `heap.ts` and `heap.util.ts` and
 is not duplicated.
 
@@ -130,50 +132,48 @@ same set minus `create`, which the constructor replaces, plus `forEach` and
 
 ## Complexity, as implemented
 
-| Operation              | Cost                      |
-| ---------------------- | ------------------------- |
-| `size` `peek`          | `O(1)`                    |
-| `add`                  | `O(log n)`                |
-| `pop`                  | `O(log n)`                |
-| `remove`               | `O(log n)`                |
-| `increase` `decrease`  | `O(log n)`                |
-| `clear`                | `O(n)`                    |
-| `entries` `keys`       | `O(n)` time, `O(1)` space |
-| `forEach`              | `O(n)`                    |
-| `create(initialNodes)` | `O(n)`                    |
+| Operation              | Cost                                      |
+| ---------------------- | ----------------------------------------- |
+| `size` `peek`          | `O(1)`                                    |
+| `add`                  | `O(log n)`                                |
+| `pop`                  | `O(log n)`                                |
+| `remove`               | `O(log n)`                                |
+| `increase` `decrease`  | `O(log n)`                                |
+| `clear`                | `O(n)`                                    |
+| `entries` `keys`       | `O(1)` call, `O(n)` drained, `O(1)` space |
+| `forEach`              | `O(n)`                                    |
+| `create(initialNodes)` | `O(n)`                                    |
 
-Two of these are worth reading twice. `clear` is linear rather than constant
-because it deletes each element from the index map before truncating the
-array. And the `O(log n)` on `remove` covers the rebalance alone. What it leaves
-out is the map lookup that locates the element, which is `O(1)` here and a
-linear scan in a heap without the map.
+`clear` is linear rather than constant because it deletes each element from
+the index map before truncating the array. The `O(log n)` on `remove` covers
+the rebalance alone. What it leaves out is the map lookup that locates the
+element, which is `O(1)` here and a linear scan in a heap without the map.
 
 `create` reaches `O(n)` through Floyd's bottom-up heapify rather than a loop of
 `add` calls: it fills the array and the index map in a single pass, then
 heapifies down from the last parent (`⌊n/2⌋ - 1`) to the root. `O(log n)` per
 insertion would cost `O(n log n)` over the whole array.
 
-`remove` is also the operation whose implementation is least obvious. An
-element that is already the last one is popped outright. Any other is swapped
-with the last position, popped from there, and the replacement left behind is
-heapified **in both directions**: an element promoted from the end of the array
-may belong above its new parent as easily as below its new children, and only
-one of the two calls ever does work.
+`remove` takes two paths. An element that is already the last one is popped
+outright. Any other is swapped with the last position, popped from there, and
+the replacement left behind is heapified **in both directions**: an element
+promoted from the end of the array may belong above its new parent as easily
+as below its new children, and at most one of the two calls does any work.
 
-Iteration deserves its own line because the notation hides the surprise:
-`entries` and `keys` are `O(n)` over the underlying array, and array order in
-a heap is not priority order. Sorted output costs `O(n log n)` through
-repeated `pop`, which empties the structure.
+`entries` and `keys` are generators: the call is `O(1)` and the `O(n)` falls
+where they are drained. They walk the underlying array rather than priority
+order, and priority order costs `O(n log n)` through repeated `pop`, which
+empties the structure.
 
 ## Extending
 
 Two routes, for two different intentions.
 
 **Subclass a concrete class** when the structure is right and the API is
-missing something. The most common addition is a membership test, which the
-class API does not provide and a subclass cannot answer from the heap itself.
-The index map is reachable only through the `#heap` private field, so the set
-has to be maintained beside the heap rather than read out of it:
+missing something. A membership test is one such addition, and one a subclass
+cannot answer from the heap itself: the index map is reachable only through
+the `#heap` private field, so the set has to be maintained beside the heap
+rather than read out of it:
 
 ```typescript
 import { MinHeap, IHeapNode } from 'addressable-binary-heaps';
@@ -220,9 +220,10 @@ console.log(queue.has(build), queue.pop()?.id, queue.has(build)); // true test t
 a d-ary heap, a heap over a comparator instead of a numeric key, or one backed
 by a typed array. It requires `size`, `[Symbol.iterator]`, `add`, `clear`,
 `decrease`, `entries`, `forEach`, `increase`, `keys`, `peek`, `pop` and
-`remove`, and it constrains nothing about how they are implemented. Note that
-the abstract signature declares `[Symbol.iterator](reversed: boolean)`, so an
-implementation accepts the argument even though `for...of` never passes it.
+`remove`, and it constrains nothing about how they are implemented.
+`[Symbol.iterator]`, `entries` and `keys` declare `reversed` as optional, so
+`for...of`, which never passes it, type-checks against the abstract class as
+well as against the concrete ones.
 
 The third route is the lightest: the core functions accept anything satisfying
 `IHeapArray<N>`, so a structure that is an array with an `indices` map can be
@@ -238,8 +239,8 @@ label their output by extension — `.mjs` and `.d.mts` on the ES side, `.cjs`
 and `.d.cts` on the CommonJS side.
 
 Two scripts check the result. `check-declared-paths` verifies that every path
-`package.json` declares exists, and that each entry point carries the extension
-of the module system it is declared for; `check-dist-loads` loads the two built
-entries the way a consumer would, the CommonJS one with `require` and the ES
-one with `import`. Jest covers both layers, and `npm run verify` runs the type
-check, the linter, the build and both checks in sequence.
+declared in `package.json` exists, and that each entry point carries the
+extension of the module system it is declared for. `check-dist-loads` loads the
+two built entries the way a consumer would, the CommonJS one with `require` and
+the ES one with `import`. Jest covers both layers, and `npm run verify` runs the
+type check, the linter, the build and both checks in sequence.

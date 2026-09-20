@@ -3,7 +3,7 @@
 Behaviour that surprises readers of the API, what the library does instead of
 throwing, and the questions the package shape raises.
 
-**Last verified:** 2026-09-19 · v1.2.0
+**Last verified:** 2026-09-21 · v1.2.0
 
 ## Behaviour
 
@@ -138,7 +138,7 @@ console.log([...q5].map((t) => `${t.id}:${t.key}`));
 ```
 
 The copy at index `4` now holds a key smaller than its parent at index `1`,
-which is the invariant broken. If a job can be queued more than once, give
+which breaks the invariant. If a job can be queued more than once, give
 each occurrence its own object.
 
 ### Can one object be in two heaps at once?
@@ -184,7 +184,7 @@ heap.
 
 ### How do I check whether an element is still in the heap?
 
-There is no `has`. The class API answers only indirectly: `remove`, `increase`
+There is no `has`. The class API answers only indirectly. `remove`, `increase`
 and `decrease` all return `false` for an element the heap does not hold, and
 the two that would otherwise write to `key` leave it untouched:
 
@@ -409,22 +409,22 @@ and makes misuse silent rather than loud. These are the cases worth knowing:
 | `increase` / `decrease` for an element it does not hold | `false`; `key` is **not** modified                                                                                                |
 | the same object added twice                             | two positions share one recorded index; an update reaches one of them                                                             |
 | `node.key` assigned directly                            | nothing moves                                                                                                                     |
-| a `key` that is not a finite number                     | ordered by whatever `<`, `>`, `<=` and `>=` do with it — for `NaN` they return `false` every time, leaving its position undefined |
+| a `key` that is `NaN`, or not a number at all           | ordered by whatever `<`, `>`, `<=` and `>=` do with it — for `NaN` they return `false` every time, leaving its position undefined |
 
-The duplicated object is the one that costs correctness: it leaves a
-structurally valid heap whose top is wrong. The rest report failure through
-their return value.
+The first three rows report failure through their return value. The last three
+do not: each leaves the heap ordered on something that is no longer true, and
+nothing in the API says so.
 
 The last row is the widest. The heap only ever applies `<`, `>`, `<=` and `>=`
-to keys, so a key that is not a finite number is still ordered — by whatever
-those operators do with it. They may coerce it to a number, compare it as
+to keys, so a key that is not a number is still ordered — by whatever those
+operators do with it. They may coerce it to a number, compare it as
 text, or never return `true` at all.
 
 `NaN` is that last case, and it is the worst of them. The rebalancing never
 finds its stop condition, so the node moves at every comparison it takes part
-in: to the root on `add`, back down a level as later insertions pass it, and
-out to a leaf on `increase` or `decrease`. Its position is undefined, not
-merely wrong. Keep keys finite numbers.
+in: to the root on `add`, back down a level as later insertions climb past it,
+and to the root once more on `increase` or `decrease`. Its position is
+undefined, not merely wrong. Keep keys finite numbers.
 
 ## Environment and integration
 
@@ -432,8 +432,7 @@ merely wrong. Keep keys finite numbers.
 
 Yes. `src/` references no platform API — no `process`, no `document`, no
 `Buffer`, no timers — so the built modules run unmodified in browsers, Node,
-Deno, Bun, workers and edge runtimes. There is nothing to polyfill. The one
-platform requirement is `WeakMap`, which every ES2015 runtime has.
+Deno, Bun, workers and edge runtimes. There is nothing to polyfill.
 
 ### ESM or CommonJS?
 

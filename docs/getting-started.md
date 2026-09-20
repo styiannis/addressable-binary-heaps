@@ -3,7 +3,7 @@
 From an empty project to a priority queue you can add to, take from, reorder
 while it is full, and cancel out of.
 
-**Last verified:** 2026-09-19 · v1.2.0 · Node ≥ 18.12
+**Last verified:** 2026-09-21 · v1.2.0 · Node ≥ 18.12
 
 ## Install
 
@@ -47,7 +47,7 @@ console.log(queue.peek()?.id, queue.peek()?.key); // test 1
 
 Pass the class as the generic parameter, as `MinHeap<Task>` does above, and
 `peek`, `pop` and the iterators all give you back a `Task`. In a `MinHeap` the
-lowest key is the top; `MaxHeap` offers the identical API with the comparison
+lowest key is the top. `MaxHeap` offers the identical API with the comparison
 reversed.
 
 ## Take from the top
@@ -116,11 +116,10 @@ console.log(compile.key, queue.peek()?.id); // 103 deploy
 console.log(queue.decrease(new Task('stranger', 0), 1)); // false
 ```
 
-`decrease` subtracts the amount from `key` and moves the element to wherever
-that new key belongs; `increase` adds and does the same in the other
-direction. Both take the element, not an index or a handle, and both return
-`false` if the heap does not hold it, as the last call above shows for an
-element that was never added.
+`decrease` subtracts the amount from `key` and `increase` adds it, and both
+then move the element in whichever direction its new key belongs. Both take the
+element, not an index or a handle, and both return `false` if the heap does not
+hold it, as the last call above shows for an element that was never added.
 
 ## Cancel an element from anywhere
 
@@ -231,8 +230,9 @@ console.log(scores.peek()?.id); // bob
 console.log(scores.increase(scores.peek()!, 9), scores.peek()?.key); // true 100
 ```
 
-`increase` and `decrease` keep their names in both classes, so `increase` moves
-an element towards the top of a `MaxHeap` and away from the top of a `MinHeap`.
+`increase` and `decrease` keep their names in both classes, so a positive
+amount passed to `increase` moves an element towards the top of a `MaxHeap` and
+away from the top of a `MinHeap`.
 
 ## Work without classes
 

@@ -160,24 +160,24 @@ console.log(minHeap.peek(low)?.key, maxHeap.peek(high)?.key); // 1 3
 in for either. Every member but `forEach` and `[Symbol.iterator]` has a
 functional counterpart, shown here for `minHeap` and identical for `maxHeap`:
 
-| Class member                   | Function                            | Cost                    |
-| ------------------------------ | ----------------------------------- | ----------------------- |
-| `new MinHeap(initial?)`        | `minHeap.create(initial?)`          | `O(n)`                  |
-| `size`                         | `minHeap.size(h)`                   | `O(1)`                  |
-| `add(node)`                    | `minHeap.add(h, node)`              | `O(log n)`              |
-| `peek()`                       | `minHeap.peek(h)`                   | `O(1)`                  |
-| `pop()`                        | `minHeap.pop(h)`                    | `O(log n)`              |
-| `remove(node)`                 | `minHeap.remove(h, node)`           | `O(log n)`              |
-| `increase(node, amount)`       | `minHeap.increase(h, node, amount)` | `O(log n)`              |
-| `decrease(node, amount)`       | `minHeap.decrease(h, node, amount)` | `O(log n)`              |
-| `clear()`                      | `minHeap.clear(h)`                  | `O(n)`                  |
-| `entries(reversed?)`           | `minHeap.entries(h, reversed?)`     | `O(n)`, **array order** |
-| `keys(reversed?)`              | `minHeap.keys(h, reversed?)`        | `O(n)`, **array order** |
-| `forEach(callback, thisArg?)`  | —                                   | `O(n)`, **array order** |
-| `[Symbol.iterator](reversed?)` | —                                   | `O(n)`, **array order** |
+| Class member                   | Function                            | Cost                        |
+| ------------------------------ | ----------------------------------- | --------------------------- |
+| `new MinHeap(initial?)`        | `minHeap.create(initial?)`          | `O(n)`                      |
+| `size`                         | `minHeap.size(h)`                   | `O(1)`                      |
+| `add(node)`                    | `minHeap.add(h, node)`              | `O(log n)`                  |
+| `peek()`                       | `minHeap.peek(h)`                   | `O(1)`                      |
+| `pop()`                        | `minHeap.pop(h)`                    | `O(log n)`                  |
+| `remove(node)`                 | `minHeap.remove(h, node)`           | `O(log n)`                  |
+| `increase(node, amount)`       | `minHeap.increase(h, node, amount)` | `O(log n)`                  |
+| `decrease(node, amount)`       | `minHeap.decrease(h, node, amount)` | `O(log n)`                  |
+| `clear()`                      | `minHeap.clear(h)`                  | `O(n)`                      |
+| `entries(reversed?)`           | `minHeap.entries(h, reversed?)`     | `O(1)` call, `O(n)` drained |
+| `keys(reversed?)`              | `minHeap.keys(h, reversed?)`        | `O(1)` call, `O(n)` drained |
+| `forEach(callback, thisArg?)`  | —                                   | `O(n)`                      |
+| `[Symbol.iterator](reversed?)` | —                                   | `O(1)` call, `O(n)` drained |
 
-The emphasis is the one thing to carry away from the table: every form of
-iteration follows the underlying array, and array order in a heap is not
+The three generators cost nothing until something consumes them; `forEach`
+walks the array on the call. All four follow the underlying array rather than
 priority order.
 
 Nothing in the library throws. A call that cannot find its element returns
