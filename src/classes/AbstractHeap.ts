@@ -20,10 +20,10 @@ export abstract class AbstractHeap<N extends IHeapNode = IHeapNode> {
    *
    * *Note*: The traversal follows the order of the underlying array, not the priority order.
    *
-   * @param reversed - If `true`, the iterator will traverse the heap in reverse order.
+   * @param [reversed=false] - If `true`, the iterator will traverse the heap in reverse order.
    * @returns An iterator yielding heap elements in the specified order.
    */
-  abstract [Symbol.iterator](reversed: boolean): Generator<N, void, void>;
+  abstract [Symbol.iterator](reversed?: boolean): Generator<N, void, void>;
 
   /**
    * Adds a new node to the heap while maintaining the heap property.
@@ -54,7 +54,7 @@ export abstract class AbstractHeap<N extends IHeapNode = IHeapNode> {
    * @param [reversed=false] - If `true`, the iterator will traverse the heap in reverse order.
    * @returns An iterator yielding heap elements in the specified order.
    */
-  abstract entries(reversed: boolean): Generator<N, void, void>;
+  abstract entries(reversed?: boolean): Generator<N, void, void>;
 
   /**
    * Executes a callback function for each element in the heap.
@@ -88,9 +88,9 @@ export abstract class AbstractHeap<N extends IHeapNode = IHeapNode> {
    *
    * *Note*: The traversal follows the order of the underlying array, not the priority order.
    *
-   * @param reversed - If `true`, the iterator will traverse the heap in reverse order.
+   * @param [reversed=false] - If `true`, the iterator will traverse the heap in reverse order.
    */
-  abstract keys(reversed: boolean): Generator<N['key'], void, void>;
+  abstract keys(reversed?: boolean): Generator<N['key'], void, void>;
 
   /**
    * Returns the top element of the heap without removing it.
