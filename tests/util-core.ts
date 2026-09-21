@@ -1,46 +1,12 @@
 import { IHeapArray, maxHeap, minHeap } from '../src';
-import { getLeftChildIndex, getRightChildIndex } from '../src/core/heap.util';
-import { isValidObjectInstance } from './util';
+import { isValidHeap, isValidObjectInstance } from './util';
 
 function heapKeys<A extends IHeapArray>(heap: A) {
-  return heap.reduce((acc, { key }) => {
-    acc.push(key);
-    return acc;
-  }, [] as number[]);
-}
-
-function isValidHeap<A extends IHeapArray>(
-  instanceType: 'max-heap' | 'min-heap',
-  instance: A
-) {
-  let isValid = true;
-
-  const stack = [0];
-  for (
-    let index = stack.shift();
-    isValid && index !== undefined;
-    index = stack.shift()
-  ) {
-    isValid = [getLeftChildIndex(index), getRightChildIndex(index)].reduce(
-      (acc, curr) => {
-        if (acc && undefined !== instance[curr]) {
-          acc =
-            'max-heap' === instanceType
-              ? instance[index].key >= instance[curr].key
-              : instance[index].key <= instance[curr].key;
-
-          if (acc) {
-            stack.push(curr);
-          }
-        }
-
-        return acc;
-      },
-      isValid
-    );
+  const keys: number[] = [];
+  for (let node of heap) {
+    keys.push(node.key);
   }
-
-  return isValid;
+  return keys;
 }
 
 export function addAndValidate<A extends IHeapArray>(
@@ -84,7 +50,7 @@ export function popAndValidate<A extends IHeapArray>(
 export function removeAndValidate<A extends IHeapArray>(
   instanceType: 'max-heap' | 'min-heap',
   instance: A,
-  removeNode: A[0],
+  removeNode: A[number],
   expectedKeys: number[]
 ) {
   if ('max-heap' === instanceType) {
@@ -99,7 +65,7 @@ export function removeAndValidate<A extends IHeapArray>(
 export function increaseAndValidate<A extends IHeapArray>(
   instanceType: 'max-heap' | 'min-heap',
   instance: A,
-  increaseNode: A[0],
+  increaseNode: A[number],
   increaseValue: number,
   expectedKeys: number[]
 ) {
@@ -115,7 +81,7 @@ export function increaseAndValidate<A extends IHeapArray>(
 export function decreaseAndValidate<A extends IHeapArray>(
   instanceType: 'max-heap' | 'min-heap',
   instance: A,
-  decreaseNode: A[0],
+  decreaseNode: A[number],
   decreaseValue: number,
   expectedKeys: number[]
 ) {

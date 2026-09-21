@@ -3,322 +3,208 @@
 [![NPM Version](https://img.shields.io/npm/v/addressable-binary-heaps)](https://www.npmjs.com/package/addressable-binary-heaps)
 [![Coverage Status](https://img.shields.io/coverallsCoverage/github/styiannis/addressable-binary-heaps)](https://coveralls.io/github/styiannis/addressable-binary-heaps?branch=main)
 
-A versatile TypeScript library for addressable binary heaps, delivering optimized and scalable min-heap and max-heap implementations, seamlessly supporting both object-oriented and functional paradigms.
+Min-heaps and max-heaps for TypeScript in which **your object is the element**.
+The heap keeps track of where every element sits, so raising or lowering an
+element's priority, or taking it out of the queue entirely, never begins with a
+search for it, whether you use the classes or the plain functions they are
+built on.
 
-## Key Features
-
-- 🗃️ **Addressable Heaps**: Implements **min-heap** and **max-heap** structures with an **addressable architecture**, allowing direct access to elements for modifications and extensions.
-
-- 🚀 **High Performance**: Utilizes an **array-based implementation** for fast and efficient heap operations, ensuring optimal time complexity for insertions, deletions, and updates.
-
-- 🛠️ **Versatile API**: Provides both **class-based** (`MaxHeap`, `MinHeap`) and **functional** (`maxHeap`, `minHeap`) APIs, catering to different programming styles.
-
-- 🧩 **Comprehensive Operations**: Supports all essential heap functions (`add`, `remove`, `peek`, `pop`, `clear`) along with **efficient key modification methods** (`increase`, `decrease`).
-
-## Table of Contents
-
-- [System Requirements](#system-requirements)
-- [Installation](#installation)
-- [Getting Started](#getting-started)
-  - [Using Class-Based Implementation](#using-class-based-implementation)
-  - [Using Functional Implementation](#using-functional-implementation)
-- [Importing Modules](#importing-modules)
-  - [Importing the Entire Package](#importing-the-entire-package)
-  - [Importing Individual Heap Functions](#importing-individual-heap-functions)
-- [Code documentation](#code-documentation)
-- [Issues and Support](#issues-and-support)
-- [License](#license)
-
-## System Requirements
-
-| Package     | Version    |
-| ----------- | ---------- |
-| **Node.js** | ≥ `18.0.0` |
-| **npm**     | ≥ `8.0.0`  |
-
-## Installation
-
-### Install via npm
+## Install
 
 ```bash
 npm install addressable-binary-heaps
 ```
 
-### Install via yarn
+`yarn add` and `pnpm add` work the same way. The package requires Node 18.12 or
+later, and ships an ES build and a CommonJS build with type definitions for
+each.
 
-```bash
-yarn add addressable-binary-heaps
+## Your object is the element
+
+There is no wrapper node and no base class to extend. Anything carrying a
+numeric `key` is an element, and `key` is the priority the heap orders by:
+
+```typescript
+import { MinHeap } from 'addressable-binary-heaps';
+
+class Task {
+  constructor(
+    public readonly id: string,
+    public key: number
+  ) {}
+}
+
+const compile = new Task('compile', 3);
+const deploy = new Task('deploy', 5);
+const lint = new Task('lint', 8);
+
+// A heap can be built from elements you already hold, or filled one at a time.
+const queue = new MinHeap<Task>([compile, deploy, lint]);
+queue.add(new Task('test', 1));
+
+console.log(queue.size, queue.peek()?.id); // 4 test
+
+// Reprioritising takes the object itself — no index, no handle to keep.
+queue.decrease(deploy, 5);
+console.log(queue.peek()?.id, deploy.key); // deploy 0
+
+// So does cancelling. `remove` reports whether the element was there.
+console.log(queue.remove(lint), queue.size); // true 3
+console.log(queue.remove(lint)); // false
+
+console.log(queue.pop()?.id, queue.pop()?.id, queue.pop()?.id);
+// deploy test compile
 ```
 
-### Install via pnpm
+## Reaching an element that is already in the heap
 
-```bash
-pnpm install addressable-binary-heaps
-```
-
-## Getting Started
-
-Here's a quick guide to help you get started with the library.
-
-### Using Class-Based Implementation
+`increase` and `decrease` take the element rather than a position, adjust `key`,
+and restore the heap property from wherever that element happens to be sitting —
+in whichever direction the new key requires. `MaxHeap` is the same structure
+with the comparison reversed:
 
 ```typescript
 import { MaxHeap } from 'addressable-binary-heaps';
 
-const element_1 = { key: 4 };
-const element_2 = { key: 2 };
-const element_3 = { key: 6 };
+const disk = { name: 'disk', key: 2 };
 
-const initialElements = [element_1, element_2];
+const alerts = new MaxHeap([
+  disk,
+  { name: 'cpu', key: 7 },
+  { name: 'memory', key: 4 },
+  { name: 'network', key: 9 },
+  { name: 'queue', key: 5 },
+]);
 
-// Create a max-heap instance with initial elements.
-const heap = new MaxHeap(initialElements);
+console.log(alerts.peek()?.name); // network
 
-// Get heap size.
-console.log(heap.size); // 2
+// The lowest element becomes the highest, without being removed and re-added.
+alerts.increase(disk, 10);
+console.log(alerts.peek()?.name, disk.key); // disk 12
 
-// Get the heap element that has the maximum key value.
-console.log(heap.peek()); // { key: 4 }
+// Iteration follows the underlying array, not priority order.
+console.log([...alerts.keys()]); // [ 12, 9, 4, 7, 5 ]
 
-// Accessing heap elements through a loop.
-for (let elem of heap) {
-  console.log(elem);
-  /*
-  { key: 4 }
-  { key: 2 }
-  */
-}
-
-// Add new element to the heap.
-heap.add(element_3);
-
-console.log(heap.size); // 3
-console.log(heap.peek()); // { key: 6 }
-
-// Accessing heap elements with the "forEach" iterative method.
-heap.forEach((elem) => {
-  console.log(elem);
-  /*
-  { key: 6 }
-  { key: 2 }
-  { key: 4 }
-  */
-});
-
-// Increase heap element key value.
-console.log(heap.increase(element_2, 5)); // true
-
-// Accessing heap elements with the "entries" iterator.
-for (const entry of heap.entries()) {
-  console.log(entry);
-  /*
-  { key: 7 }
-  { key: 6 }
-  { key: 4 }
-  */
-}
-
-// Decrease heap element key value.
-console.log(heap.decrease(element_2, 10)); // true
-
-// Accessing heap element keys with the "keys" iterator.
-for (const key of heap.keys()) {
-  console.log(key);
-  /*
-  6
-  -3
-  4
-  */
-}
-
-// Remove from the heap the element that has the maximum key value.
-console.log(heap.pop()); // { key: 6 }
-
-console.log(heap.size); // 2
-console.log(heap.peek()); // { key: 4 }
-
-// Remove specific element from the heap.
-console.log(heap.remove(element_1)); // true
-
-console.log(heap.size); // 1
-console.log(heap.peek()); // { key: -3 }
-
-// Clear the heap.
-heap.clear();
-
-console.log(heap.size); // 0
-console.log(heap.peek()); // undefined
+// Priority order is what repeated `pop` produces.
+console.log(alerts.pop()?.name, alerts.pop()?.name); // disk network
 ```
 
-### Using Functional Implementation
+Both operations reach the element through a `WeakMap` from element to array
+index, which the heap maintains through every swap. A heap without that map has
+to scan its array before it can act on a given element, and an array kept sorted
+has to shift everything past the position that changed. The gap between those
+two and this heap grows with the size of the structure.
+[The architecture write-up](https://github.com/styiannis/addressable-binary-heaps/blob/main/docs/architecture-and-api.md#what-the-addressing-costs)
+measures all three, along with what the map itself costs.
+
+## The same heaps as plain functions
+
+The classes delegate to a layer of plain functions over a plain array, and that
+layer is exported as `minHeap` and `maxHeap`. A heap built by it is an ordinary
+`Array` carrying an `indices` property, so everything `Array` offers still works
+on it:
 
 ```typescript
-import { maxHeap } from 'addressable-binary-heaps';
+import { minHeap, IHeapArray, IHeapNode } from 'addressable-binary-heaps';
 
-const element_1 = { key: 4 };
-const element_2 = { key: 2 };
-const element_3 = { key: 6 };
-
-const initialElements = [element_1, element_2];
-
-// Create a max-heap instance with initial elements.
-const heap = maxHeap.create(initialElements);
-
-// Get heap size.
-console.log(heap.length); // 2
-
-// Get the heap element that has the maximum key value.
-console.log(maxHeap.peek(heap)); // { key: 4 }
-
-// Accessing heap elements through a loop.
-for (let elem of heap) {
-  console.log(elem);
-  /*
-  { key: 4 }
-  { key: 2 }
-  */
+interface Entry extends IHeapNode {
+  path: string;
 }
 
-// Add new element to the heap.
-maxHeap.add(heap, element_3);
+const heap = minHeap.create<IHeapArray<Entry>>([
+  { path: 'b.png', key: 40 },
+  { path: 'a.png', key: 12 },
+  { path: 'c.png', key: 7 },
+]);
 
-console.log(heap.length); // 3
-console.log(maxHeap.peek(heap)); // { key: 6 }
+console.log(minHeap.size(heap), heap.length); // 3 3
+console.log(minHeap.peek(heap)?.path); // c.png
+console.log(heap.map((e) => e.path)); // [ 'c.png', 'a.png', 'b.png' ]
 
-// Accessing heap elements with the "forEach" iterative method.
-heap.forEach((elem) => {
-  console.log(elem);
-  /*
-  { key: 6 }
-  { key: 2 }
-  { key: 4 }
-  */
-});
-
-// Increase heap element key value.
-console.log(maxHeap.increase(heap, element_2, 5)); // true
-
-// Accessing heap elements with the "entries" iterator.
-for (const entry of maxHeap.entries(heap)) {
-  console.log(entry);
-  /*
-  { key: 7 }
-  { key: 6 }
-  { key: 4 }
-  */
-}
-
-// Decrease heap element key value.
-console.log(maxHeap.decrease(heap, element_2, 10)); // true
-
-// Accessing heap element keys with the "keys" iterator.
-for (const key of maxHeap.keys(heap)) {
-  console.log(key);
-  /*
-  6
-  -3
-  4
-  */
-}
-
-// Remove from the heap the element that has the maximum key value.
-console.log(maxHeap.pop(heap)); // { key: 6 }
-
-console.log(heap.length); // 2
-console.log(maxHeap.peek(heap)); // { key: 4 }
-
-// Remove specific element from the heap.
-console.log(maxHeap.remove(heap, element_1)); // true
-
-console.log(heap.length); // 1
-console.log(maxHeap.peek(heap)); // { key: -3 }
-
-// Clear the heap.
-maxHeap.clear(heap);
-
-console.log(heap.length); // 0
-console.log(maxHeap.peek(heap)); // undefined
+console.log(minHeap.pop(heap)?.path, minHeap.size(heap)); // c.png 2
 ```
 
-## Importing Modules
+## Importing
 
-The library offers flexible import options to suit different development needs. You can import everything at once, or select individual functions as needed.
-
-### Importing the Entire Package
-
-To access all classes, interfaces, and functional APIs:
+Everything the package exports is available from its root:
 
 ```typescript
 import {
-  // Concrete Classes
-  MaxHeap,
-  MinHeap,
-
-  // Abstract Base Class
-  AbstractHeap,
-
-  // Interfaces
-  IHeapArray,
-  IHeapNode,
-
-  // Functional APIs
-  maxHeap,
-  minHeap,
+  MinHeap, // class
+  MaxHeap, // class
+  AbstractHeap, // abstract base, for an implementation of your own
+  minHeap, // the functions MinHeap delegates to
+  maxHeap, // the functions MaxHeap delegates to
+  type IHeapNode, // { key: number }
+  type IHeapArray, // Array<N> & { indices: WeakMap<N, number> }
 } from 'addressable-binary-heaps';
 ```
 
-This approach is convenient when you need a broad range of functionalities from the library.
-
-### Importing Individual Heap Functions
-
-For maximum control and minimal footprint, import individual functions or operations.
-
-#### For Max Heap
+Each core module is additionally published under its own subpath, for code that
+uses one ordering and should carry nothing of the other:
 
 ```typescript
-import {
-  add,
-  clear,
-  create,
-  decrease,
-  entries,
-  increase,
-  keys,
-  peek,
-  pop,
-  remove,
-  size,
-} from 'addressable-binary-heaps/max-heap';
+import * as minHeap from 'addressable-binary-heaps/min-heap';
+import * as maxHeap from 'addressable-binary-heaps/max-heap';
+
+const low = minHeap.create([{ key: 3 }, { key: 1 }]);
+const high = maxHeap.create([{ key: 3 }, { key: 1 }]);
+
+console.log(minHeap.peek(low)?.key, maxHeap.peek(high)?.key); // 1 3
 ```
 
-#### For Min Heap
+## API
 
-```typescript
-import {
-  add,
-  clear,
-  create,
-  decrease,
-  entries,
-  increase,
-  keys,
-  peek,
-  pop,
-  remove,
-  size,
-} from 'addressable-binary-heaps/min-heap';
-```
+`MinHeap<N>` and `MaxHeap<N>` expose the same members. Both extend
+`AbstractHeap<N>`, which is exported so that a structure of your own can stand
+in for either. Every member but `forEach` and `[Symbol.iterator]` has a
+functional counterpart, shown here for `minHeap` and identical for `maxHeap`:
 
-This method helps keep your bundle size small by only including necessary modules.
+| Class member                   | Function                            | Cost                        |
+| ------------------------------ | ----------------------------------- | --------------------------- |
+| `new MinHeap(initial?)`        | `minHeap.create(initial?)`          | `O(n)`                      |
+| `size`                         | `minHeap.size(h)`                   | `O(1)`                      |
+| `add(node)`                    | `minHeap.add(h, node)`              | `O(log n)`                  |
+| `peek()`                       | `minHeap.peek(h)`                   | `O(1)`                      |
+| `pop()`                        | `minHeap.pop(h)`                    | `O(log n)`                  |
+| `remove(node)`                 | `minHeap.remove(h, node)`           | `O(log n)`                  |
+| `increase(node, amount)`       | `minHeap.increase(h, node, amount)` | `O(log n)`                  |
+| `decrease(node, amount)`       | `minHeap.decrease(h, node, amount)` | `O(log n)`                  |
+| `clear()`                      | `minHeap.clear(h)`                  | `O(n)`                      |
+| `entries(reversed?)`           | `minHeap.entries(h, reversed?)`     | `O(1)` call, `O(n)` drained |
+| `keys(reversed?)`              | `minHeap.keys(h, reversed?)`        | `O(1)` call, `O(n)` drained |
+| `forEach(callback, thisArg?)`  | —                                   | `O(n)`                      |
+| `[Symbol.iterator](reversed?)` | —                                   | `O(1)` call, `O(n)` drained |
 
-## Code documentation
+The three generators cost nothing until something consumes them; `forEach`
+walks the array on the call. All four follow the underlying array rather than
+priority order.
 
-The complete API reference of the library is available at the [code documentation site](https://styiannis.github.io/addressable-binary-heaps/).
+Nothing in the library throws. A call that cannot find its element returns
+`false`, and `peek` or `pop` on an empty heap returns `undefined`.
 
-## Issues and Support
+## When not to use it
 
-If you encounter any issues or have questions, please [open an issue](https://github.com/styiannis/addressable-binary-heaps/issues).
+Addressing is not free: it costs memory for every element held and time on
+every insertion. What follows are the cases where nothing is bought with it.
 
-## License
+| If this describes the problem                      | Reach for                                                                                                                                      |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Only `add` and `pop`; priorities never move        | a binary heap without addressing — the index map would be paid for and never used                                                              |
+| The whole order, once, over a set already complete | `Array.prototype.sort`, which is both faster here and the shorter program                                                                      |
+| Ordering by something other than a number          | a heap that takes a comparator — `key` is typed `number` and compared with `<`, `>`, `<=` and `>=`, and there is no comparator parameter       |
+| Frequent membership tests                          | a `Set` maintained beside the heap — there is no `has`, and a `false` from `remove`, `increase` or `decrease` is the only signal the API gives |
+| One element queued in two structures at once       | a separate object per structure — `increase` and `decrease` write to `node.key`, and the other heap is never told it changed                   |
 
-This project is licensed under the [MIT License](https://github.com/styiannis/addressable-binary-heaps?tab=MIT-1-ov-file#readme).
+## Documentation
+
+- [Guides, the FAQ and the architecture write-up](https://github.com/styiannis/addressable-binary-heaps/tree/main/docs) —
+  getting a heap running, the behaviour that surprises people, and how the
+  library is built, including what the addressing measurably costs.
+- [The generated API reference](https://styiannis.github.io/addressable-binary-heaps/) —
+  every signature and every type.
+- [Open an issue](https://github.com/styiannis/addressable-binary-heaps/issues)
+  for a question or a bug report.
+
+Released under the
+[MIT License](https://github.com/styiannis/addressable-binary-heaps/blob/main/LICENSE).
