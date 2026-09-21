@@ -424,7 +424,7 @@ text, or never return `true` at all.
 finds its stop condition, so the node moves at every comparison it takes part
 in: to the root on `add`, back down a level as later insertions climb past it,
 and to the root once more on `increase` or `decrease`. Its position is
-undefined, not merely wrong. Keep keys finite numbers.
+undefined, not merely wrong. Keep keys to numbers other than `NaN`.
 
 ## Environment and integration
 
