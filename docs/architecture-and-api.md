@@ -13,9 +13,9 @@ export interface IHeapNode {
 ```
 
 There is no value field, no identifier, no wrapper node and no base class to
-extend. An element is any object that carries a number under that name, which
-means the objects a program already has become heap elements without being
-boxed into anything.
+extend. An element is any object that carries a number under the name `key`.
+That means the objects a program already has can become heap elements without
+being boxed into anything.
 
 The second type is where the design decision actually lives:
 
@@ -68,16 +68,11 @@ not.**
 
 ## Two layers
 
-`src/` divides into `core/` and `classes/`, and the division is a method
-rather than a convention.
-
-`core/` is written as small independent functions over plain objects, each
-one short enough that what happens inside it can be read off the page, **and
-so can the resources it requires**. `minHeap.remove` fits on one screen, and
-the reason it is `O(log n)` is visible in it: an element already at the end of
-the array is popped outright, and any other costs one `indices.get` to locate
-it plus the two `heapify` calls that follow, which are the only work that
-depends on the size of the heap.
+`src/` divides into `core/` and `classes/`. The division is a method, not a
+convention: `core/` is written as small independent functions over plain
+arrays, each with behaviour and cost that can be checked in the function
+itself. The classes and the generics sit on top of that layer rather than
+inside it.
 
 ```
 src/
@@ -92,24 +87,20 @@ src/
 └── types.ts             IHeapNode, IHeapArray
 ```
 
-`min-heap.ts` and `max-heap.ts` are deliberate near-duplicates rather than one
-parameterised module: the two `heapify` helpers differ only in their
-comparison operators — `<` against `>` to choose the child to descend into,
-`<=` against `>=` to stop — and inlining that difference keeps each file's
-cost readable in the file itself. What they genuinely share — `clear`, `size`, `peek`, `entries`,
-`keys`, and the index arithmetic — lives in `heap.ts` and `heap.util.ts` and
-is not duplicated.
-
 The `classes/` layer contains no algorithm. `MinHeap.pop` is
-`return minHeap.pop(this.#heap)`, and every method but `forEach` has that
-shape. What the layer adds is the generic parameter that carries your element
-type through the API, the `Symbol.iterator` implementation, `forEach`, and
-prototypes for code that prefers them.
+`return minHeap.pop(this.#heap)`, and every method but `forEach` follows the
+same pattern. What the layer adds is the generic parameter that carries your
+element type through the API, the `Symbol.iterator` implementation, `forEach`,
+and prototypes for code that prefers them.
 
-Unlike the array it wraps, a class instance is not itself an `IHeapArray`: the
-heap is held in a `#heap` private field, so the core functions cannot be
-applied to a `MinHeap`. Choose a layer per structure rather than mixing them
-on one.
+The two layers do not mix on one heap. A `MinHeap` keeps its array in a
+`#heap` private field and is not itself an `IHeapArray`, so the core functions
+cannot be applied to it. The layer is chosen per heap.
+
+`min-heap.ts` and `max-heap.ts` are near-duplicates on purpose. Their
+`heapify` helpers differ only in the comparison operators, and writing each
+file out in full keeps the cost of every function readable in the file itself.
+What the two share lives in `heap.ts` and `heap.util.ts`.
 
 ## The public surface
 
@@ -142,28 +133,28 @@ same set minus `create`, which the constructor replaces, plus `forEach` and
 | `clear`                | `O(n)`                                    |
 | `entries` `keys`       | `O(1)` call, `O(n)` drained, `O(1)` space |
 | `forEach`              | `O(n)`                                    |
+| `create()`             | `O(1)`                                    |
 | `create(initialNodes)` | `O(n)`                                    |
 
-`clear` is linear rather than constant because it deletes each element from
-the index map before truncating the array. The `O(log n)` on `remove` covers
-the rebalance alone. What it leaves out is the map lookup that locates the
-element, which is `O(1)` here and a linear scan in a heap without the map.
+`create` without `initialNodes` returns an empty heap in `O(1)`. With
+`initialNodes`, it builds the heap in `O(n)` using Floyd's bottom-up heapify:
+the elements are placed in the array as given, then every parent is heapified
+down, from the last one back to the root. Adding the same elements one at a
+time would cost `O(n log n)`.
 
-`create` reaches `O(n)` through Floyd's bottom-up heapify rather than a loop of
-`add` calls: it fills the array and the index map in a single pass, then
-heapifies down from the last parent (`⌊n/2⌋ - 1`) to the root. `O(log n)` per
-insertion would cost `O(n log n)` over the whole array.
+`clear` is linear rather than constant. The index map is a `WeakMap`, which has
+no `clear` method, so each element's entry is deleted one at a time before the
+array is truncated.
 
-`remove` takes two paths. An element that is already the last one is popped
-outright. Any other is swapped with the last position, popped from there, and
-the replacement left behind is heapified **in both directions**: an element
-promoted from the end of the array may belong above its new parent as easily
-as below its new children, and at most one of the two calls does any work.
+`remove` locates the element through the index map in `O(1)`, swaps it with
+the last element and pops it. The element moved into its place is then
+heapified in both directions, but at most one of the two calls moves anything,
+so the cost stays `O(log n)`.
 
-`entries` and `keys` are generators: the call is `O(1)` and the `O(n)` falls
-where they are drained. They walk the underlying array rather than priority
-order, and priority order costs `O(n log n)` through repeated `pop`, which
-empties the structure.
+`entries` and `keys` are generators. Calling one costs `O(1)`, and the `O(n)`
+is paid as it is drained. Both walk the underlying array, not priority order.
+Priority order costs `O(n log n)` through repeated `pop`, which empties the
+heap along the way.
 
 ## Extending
 
@@ -171,9 +162,9 @@ Two routes, for two different intentions.
 
 **Subclass a concrete class** when the structure is right and the API is
 missing something. A membership test is one such addition, and one a subclass
-cannot answer from the heap itself: the index map is reachable only through
-the `#heap` private field, so the set has to be maintained beside the heap
-rather than read out of it:
+cannot answer from the heap itself. The index map sits behind the `#heap`
+private field, so the set has to be maintained beside the heap rather than read
+out of it:
 
 ```typescript
 import { MinHeap, IHeapNode } from 'addressable-binary-heaps';

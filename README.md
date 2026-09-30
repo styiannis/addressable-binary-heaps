@@ -4,7 +4,7 @@
 [![Coverage Status](https://img.shields.io/coverallsCoverage/github/styiannis/addressable-binary-heaps)](https://coveralls.io/github/styiannis/addressable-binary-heaps?branch=main)
 
 Min-heaps and max-heaps for TypeScript in which **your object is the element**.
-The heap keeps track of where every element sits, so raising or lowering an
+The heap keeps track of every element's position, so raising or lowering an
 element's priority, or taking it out of the queue entirely, never begins with a
 search for it, whether you use the classes or the plain functions they are
 built on.
@@ -40,8 +40,8 @@ const lint = new Task('lint', 8);
 
 // A heap can be built from elements you already hold, or filled one at a time.
 const queue = new MinHeap<Task>([compile, deploy, lint]);
-queue.add(new Task('test', 1));
 
+queue.add(new Task('test', 1));
 console.log(queue.size, queue.peek()?.id); // 4 test
 
 // Reprioritising takes the object itself — no index, no handle to keep.
