@@ -94,6 +94,8 @@ index, which the heap maintains through every swap. A heap without that map has
 to scan its array before it can act on a given element, and an array kept sorted
 has to shift everything past the position that changed. The gap between those
 two and this heap grows with the size of the structure.
+[The architecture write-up](https://github.com/styiannis/addressable-binary-heaps/blob/main/docs/architecture-and-api.md#what-the-addressing-costs)
+measures all three, along with what the map itself costs.
 
 ## The same heaps as plain functions
 
@@ -196,6 +198,9 @@ every insertion. What follows are the cases where nothing is bought with it.
 
 ## Documentation
 
+- [Guides, the FAQ and the architecture write-up](https://github.com/styiannis/addressable-binary-heaps/tree/main/docs) —
+  getting a heap running, the behaviour that surprises people, and how the
+  library is built, including what the addressing measurably costs.
 - [The generated API reference](https://styiannis.github.io/addressable-binary-heaps/) —
   every signature and every type.
 - [Open an issue](https://github.com/styiannis/addressable-binary-heaps/issues)
