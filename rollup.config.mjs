@@ -1,5 +1,3 @@
-// For detailed Rollup configuration options, visit: https://rollupjs.org/configuration-options/
-
 import resolve from '@rollup/plugin-node-resolve';
 import typescript from '@rollup/plugin-typescript';
 import fs from 'node:fs';
