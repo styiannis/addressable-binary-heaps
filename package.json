@@ -63,7 +63,7 @@
     "docs": "node ./scripts/clear.cjs ./code_documentation && typedoc --basePath ./ --entryPoints src/index.ts --entryPointStrategy Expand --readme none --includeVersion --out code_documentation --name \"Addressable Binary Heaps\"",
     "format": "prettier -w ./",
     "lint": "oxlint --deny-warnings ./",
-    "prepack": "npm i && npm run build",
+    "prepack": "npm run build",
     "reset": "npm run clear && node ./scripts/clear.cjs ./node_modules",
     "reset-hard": "npm run reset && node ./scripts/clear.cjs ./package-lock.json ./yarn.lock ./pnpm-lock.yaml",
     "test": "jest",
