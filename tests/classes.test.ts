@@ -236,7 +236,7 @@ describe('Classes', () => {
         popped.push(node.key);
       }
 
-      expect(popped.length).toBe(values.length - 1);
+      expect(popped).toHaveLength(values.length - 1);
 
       popped.reduce((prev, curr) => {
         expect(

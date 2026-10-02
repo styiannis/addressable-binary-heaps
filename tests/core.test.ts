@@ -183,7 +183,7 @@ describe('Core', () => {
       });
 
       expect(heap.remove(instance, { key: 999 })).toBe(false); // Try to remove an invalid node.
-      expect(instance.length).toBe(values.length);
+      expect(instance).toHaveLength(values.length);
 
       removeNodesIndices.forEach((nodeIndex, i) => {
         const removeNode = nodes[nodeIndex];
@@ -232,7 +232,7 @@ describe('Core', () => {
         popped.push(node.key);
       }
 
-      expect(popped.length).toBe(values.length - 1);
+      expect(popped).toHaveLength(values.length - 1);
 
       popped.reduce((prev, curr) => {
         expect(
