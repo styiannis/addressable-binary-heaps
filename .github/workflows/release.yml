@@ -26,7 +26,7 @@ jobs:
       # Validate code
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci --ignore-scripts
 
       - name: Verify (type checks, linting, build, dist checks)
         run: npm run verify
