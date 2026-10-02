@@ -1,6 +1,7 @@
 import { IHeapArray } from '../types';
 import * as heap from './heap';
 import {
+  buildHeap,
   getLeftChildIndex,
   getParentIndex,
   getRightChildIndex,
@@ -34,7 +35,8 @@ function heapifyDown<H extends IHeapArray>(instance: H, index: number) {
     rightChild !== undefined && rightChild.key > leftChild.key ? ri : li;
 
   if (
-    (instance[index] as H[0]).key >= (instance[higherKeyChildIndex] as H[0]).key
+    (instance[index] as H[number]).key >=
+    (instance[higherKeyChildIndex] as H[number]).key
   ) {
     return;
   }
@@ -56,7 +58,7 @@ function heapifyUp<H extends IHeapArray>(instance: H, index: number) {
 
   if (
     instance[pi] === undefined ||
-    instance[pi].key > (instance[index] as H[0]).key
+    instance[pi].key >= (instance[index] as H[number]).key
   ) {
     return;
   }
@@ -77,15 +79,13 @@ function heapifyUp<H extends IHeapArray>(instance: H, index: number) {
  * @returns A new max-heap instance.
  */
 export function create<H extends IHeapArray>(
-  initialNodes?: H[0][] | Readonly<H[0][]>
+  initialNodes?: H[number][] | Readonly<H[number][]>
 ) {
   const instance = [] as unknown as H;
   instance.indices = new WeakMap();
 
   if (initialNodes) {
-    for (const node of initialNodes) {
-      add(instance, node);
-    }
+    buildHeap(instance, initialNodes, heapifyDown);
   }
 
   return instance;
@@ -114,13 +114,13 @@ export function size<H extends IHeapArray>(instance: H) {
 
 /**
  * Adds a new element to the max-heap while maintaining the heap property.
- * The element is initially added at the end and then bubbled up as needed.
+ * The element is initially added at the end and then heapified up as needed.
  *
  * @typeParam H - The type of max-heap array.
  * @param instance - The max-heap instance.
  * @param node - The new element to add.
  */
-export function add<H extends IHeapArray>(instance: H, node: H[0]) {
+export function add<H extends IHeapArray>(instance: H, node: H[number]) {
   instance.indices.set(node, instance.length);
   instance.push(node);
   heapifyUp(instance, instance.length - 1);
@@ -151,12 +151,14 @@ export function pop<H extends IHeapArray>(instance: H) {
   }
 
   if (1 === instance.length) {
-    return instance.pop() as H[0];
+    const popped = instance.pop() as H[number];
+    instance.indices.delete(popped);
+    return popped;
   }
 
   swapHeapNodes(instance, 0, instance.length - 1);
 
-  const popped = instance.pop() as H[0];
+  const popped = instance.pop() as H[number];
   instance.indices.delete(popped);
   heapifyDown(instance, 0);
 
@@ -172,13 +174,14 @@ export function pop<H extends IHeapArray>(instance: H) {
  * @param node - The element to remove.
  * @returns `true` if element was found and removed, `false` otherwise.
  */
-export function remove<H extends IHeapArray>(instance: H, node: H[0]) {
+export function remove<H extends IHeapArray>(instance: H, node: H[number]) {
   if (0 === instance.length) {
     return false;
   }
 
   if (node === instance.at(-1)) {
     instance.pop();
+    instance.indices.delete(node);
     return true;
   }
 
@@ -189,14 +192,16 @@ export function remove<H extends IHeapArray>(instance: H, node: H[0]) {
   }
 
   swapHeapNodes(instance, index, instance.length - 1);
-  const deleted = instance.indices.delete(instance.pop() as H[0]);
+  const deleted = instance.indices.delete(instance.pop() as H[number]);
   heapifyDown(instance, index);
+  heapifyUp(instance, index);
   return deleted;
 }
 
 /**
  * Increases the key value of a heap element by a specified amount.
- * After increase, element may need to bubble up to maintain heap property.
+ * The element is rebalanced in whichever direction the new key requires,
+ * so a negative amount is handled the same as a positive one.
  *
  * @typeParam H - The type of max-heap array.
  * @param instance - The max-heap instance.
@@ -206,7 +211,7 @@ export function remove<H extends IHeapArray>(instance: H, node: H[0]) {
  */
 export function increase<H extends IHeapArray>(
   instance: H,
-  node: H[0],
+  node: H[number],
   increaseValue: number
 ) {
   const index = instance.indices.get(node);
@@ -216,6 +221,7 @@ export function increase<H extends IHeapArray>(
   }
 
   node.key += increaseValue;
+  heapifyDown(instance, index);
   heapifyUp(instance, index);
 
   return true;
@@ -223,7 +229,8 @@ export function increase<H extends IHeapArray>(
 
 /**
  * Decreases the key value of a heap element by a specified amount.
- * After decrease, element may need to sink down to maintain heap property.
+ * The element is rebalanced in whichever direction the new key requires,
+ * so a negative amount is handled the same as a positive one.
  *
  * @typeParam H - The type of max-heap array.
  * @param instance - The max-heap instance.
@@ -233,7 +240,7 @@ export function increase<H extends IHeapArray>(
  */
 export function decrease<H extends IHeapArray>(
   instance: H,
-  node: H[0],
+  node: H[number],
   decreaseValue: number
 ) {
   const index = instance.indices.get(node);
@@ -244,6 +251,7 @@ export function decrease<H extends IHeapArray>(
 
   node.key -= decreaseValue;
   heapifyDown(instance, index);
+  heapifyUp(instance, index);
 
   return true;
 }

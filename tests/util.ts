@@ -1,7 +1,10 @@
-import { AbstractHeap, MaxHeap, MinHeap } from '../src';
+import { AbstractHeap, IHeapNode, MaxHeap, MinHeap } from '../src';
+import { getLeftChildIndex, getRightChildIndex } from '../src/core/heap.util';
 
 const arraysEqual = (a: any[], b: any[]) =>
   a.length === b.length && a.every((val, i) => val === b[i]);
+
+const stringSort = (a: string, b: string) => a.localeCompare(b);
 
 export function isValidObjectInstance(
   instanceType: 'max-heap' | 'min-heap' | 'heap-node',
@@ -11,7 +14,7 @@ export function isValidObjectInstance(
     return false;
   }
 
-  const props = Object.getOwnPropertyNames(instance).sort();
+  const props = Object.getOwnPropertyNames(instance).sort(stringSort);
 
   if ('heap-node' === instanceType) {
     return (
@@ -23,17 +26,21 @@ export function isValidObjectInstance(
   return Array.isArray(instance) && arraysEqual(props, ['indices', 'length']);
 }
 
+export function toCoreInstanceType(classInstanceType: 'MaxHeap' | 'MinHeap') {
+  return 'MinHeap' === classInstanceType ? 'min-heap' : 'max-heap';
+}
+
 export function isValidClassInstance(
-  instanceType: 'MaxHeap' | 'MinHeap',
+  classInstanceType: 'MaxHeap' | 'MinHeap',
   instance: unknown
 ) {
   if ('object' !== typeof instance) {
     return false;
   }
 
-  const props = Object.getOwnPropertyNames(instance).sort();
+  const props = Object.getOwnPropertyNames(instance).sort(stringSort);
   const proto = Object.getPrototypeOf(instance);
-  const protoProps = Object.getOwnPropertyNames(proto).sort();
+  const protoProps = Object.getOwnPropertyNames(proto).sort(stringSort);
 
   if (
     !arraysEqual(props, []) ||
@@ -57,9 +64,52 @@ export function isValidClassInstance(
     return false;
   }
 
-  if ('MaxHeap' === instanceType) {
+  if ('MaxHeap' === classInstanceType) {
     return instance instanceof MaxHeap && proto === MaxHeap.prototype;
   }
 
   return instance instanceof MinHeap && proto === MinHeap.prototype;
+}
+
+export function isValidHeap<A extends IHeapNode[]>(
+  instanceType: 'max-heap' | 'min-heap',
+  instance: A
+) {
+  const stack = [0];
+
+  let isValid = true;
+
+  for (
+    let index = stack.shift();
+    isValid && index !== undefined;
+    index = stack.shift()
+  ) {
+    const parent = instance[index];
+
+    if (parent === undefined) {
+      continue;
+    }
+
+    isValid = [getLeftChildIndex(index), getRightChildIndex(index)].reduce(
+      (acc, curr) => {
+        const child = instance[curr];
+
+        if (acc && child) {
+          acc =
+            'max-heap' === instanceType
+              ? parent.key >= child.key
+              : parent.key <= child.key;
+
+          if (acc) {
+            stack.push(curr);
+          }
+        }
+
+        return acc;
+      },
+      isValid
+    );
+  }
+
+  return isValid;
 }

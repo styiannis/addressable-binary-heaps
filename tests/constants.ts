@@ -117,6 +117,36 @@ export const TESTS_DATA = {
       ],
     },
   },
+  infiniteKeys: {
+    maxHeap: {
+      values: [50, 40, 30, 20, 10, 5, 1],
+      expectedPopOrderWithInfinities: [
+        Infinity,
+        50,
+        40,
+        30,
+        20,
+        10,
+        5,
+        1,
+        -Infinity,
+      ],
+    },
+    minHeap: {
+      values: [50, 40, 30, 20, 10, 5, 1],
+      expectedPopOrderWithInfinities: [
+        -Infinity,
+        1,
+        5,
+        10,
+        20,
+        30,
+        40,
+        50,
+        Infinity,
+      ],
+    },
+  },
   remove: {
     maxHeap: {
       values: [4, 7, 6, 1, 9, 3],
@@ -145,6 +175,16 @@ export const TESTS_DATA = {
       ],
     },
   },
+  removeRebalanceTowardRoot: {
+    maxHeap: {
+      values: [50, 20, 40, 38, 39, 36, 48],
+      expectedPopOrderDirection: -1,
+    },
+    minHeap: {
+      values: [0, 30, 10, 12, 11, 14, 2],
+      expectedPopOrderDirection: 1,
+    },
+  },
   increase: {
     maxHeap: {
       values: [4, 7, 6, 1, 9],
@@ -156,7 +196,7 @@ export const TESTS_DATA = {
         [3, 2],
         [3, 7],
         [2, 10],
-      ],
+      ] as const,
       expectedAfterIncreases: [
         [9, 7, 6, 1, 4],
         [9, 8, 6, 1, 7],
@@ -176,7 +216,7 @@ export const TESTS_DATA = {
         [3, 2],
         [3, 7],
         [2, 10],
-      ],
+      ] as const,
       expectedAfterIncreases: [
         [1, 4, 6, 7, 9],
         [1, 7, 6, 8, 9],
@@ -198,7 +238,7 @@ export const TESTS_DATA = {
         [3, 2],
         [3, 7],
         [2, 10],
-      ],
+      ] as const,
       expectedAfterDecreases: [
         [9, 7, 6, 1, 4],
         [9, 7, 6, 1, 0],
@@ -218,7 +258,7 @@ export const TESTS_DATA = {
         [3, 2],
         [3, 7],
         [2, 10],
-      ],
+      ] as const,
       expectedAfterDecreases: [
         [1, 4, 6, 7, 9],
         [0, 1, 6, 7, 9],
@@ -229,6 +269,20 @@ export const TESTS_DATA = {
       ],
     },
   },
+  increaseDecreaseNegativeAmount: {
+    maxHeap: {
+      values: [10, 40, 5, 30, 2, 20, 15],
+      increaseNodeIndex: 3,
+      decreaseNodeIndex: 6,
+      negativeAmount: -1000,
+    },
+    minHeap: {
+      values: [10, 40, 5, 30, 2, 20, 15],
+      increaseNodeIndex: 3,
+      decreaseNodeIndex: 2,
+      negativeAmount: -1000,
+    },
+  },
   iterators: {
     maxHeap: {
       values: [8, 6, 5, 2, 9, 4, 1, 7, 3],
@@ -236,7 +290,7 @@ export const TESTS_DATA = {
     },
     minHeap: {
       values: [8, 6, 5, 2, 9, 4, 1, 7, 3],
-      expectedInOrder: [1, 3, 2, 5, 9, 6, 4, 8, 7],
+      expectedInOrder: [1, 2, 4, 3, 9, 8, 5, 7, 6],
     },
   },
 };

@@ -34,7 +34,7 @@ export function size<H extends IHeapArray>(instance: H) {
  * @returns The top element if heap is not empty, `undefined` otherwise.
  */
 export function peek<H extends IHeapArray>(instance: H) {
-  return 0 === instance.length ? undefined : (instance[0] as H[0]);
+  return 0 === instance.length ? undefined : (instance[0] as H[number]);
 }
 
 /**
@@ -50,13 +50,13 @@ export function peek<H extends IHeapArray>(instance: H) {
 export function* entries<H extends IHeapArray>(instance: H, reversed: boolean) {
   if (reversed) {
     for (let i = instance.length - 1; i >= 0; i -= 1) {
-      yield instance[i] as H[0];
+      yield instance[i] as H[number];
     }
     return;
   }
 
   for (const node of instance) {
-    yield node as H[0];
+    yield node as H[number];
   }
 }
 
@@ -73,7 +73,7 @@ export function* entries<H extends IHeapArray>(instance: H, reversed: boolean) {
 export function* keys<H extends IHeapArray>(instance: H, reversed: boolean) {
   if (reversed) {
     for (let i = instance.length - 1; i >= 0; i -= 1) {
-      yield (instance[i] as H[0]).key;
+      yield (instance[i] as H[number]).key;
     }
     return;
   }
