@@ -189,7 +189,7 @@ describe('Core', () => {
         const removeNode = nodes[nodeIndex];
         const expectedKeys = expectedAfterRemovals[i];
 
-        expect(removeNode).not.toBe(undefined);
+        expect(removeNode).not.toBeUndefined();
         expect(Array.isArray(expectedKeys)).toBe(true);
 
         if (removeNode && expectedKeys) {
@@ -220,7 +220,7 @@ describe('Core', () => {
 
       const removeNode = nodes[1];
 
-      expect(removeNode).not.toBe(undefined);
+      expect(removeNode).not.toBeUndefined();
 
       if (removeNode) {
         expect(heap.remove(instance, removeNode)).toBe(true);
@@ -253,7 +253,7 @@ describe('Core', () => {
       const instance = heap.create(nodes);
       const lastNode = instance.at(-1);
 
-      expect(lastNode).not.toBe(undefined);
+      expect(lastNode).not.toBeUndefined();
 
       if (lastNode) {
         expect(heap.remove(instance, lastNode)).toBe(true);
@@ -306,7 +306,7 @@ describe('Core', () => {
         const increaseNode = nodes[nodeIndex];
         const expectedKeys = expectedAfterIncreases[i];
 
-        expect(increaseNode).not.toBe(undefined);
+        expect(increaseNode).not.toBeUndefined();
         expect(Array.isArray(expectedKeys)).toBe(true);
 
         if (increaseNode && expectedKeys) {
@@ -352,7 +352,7 @@ describe('Core', () => {
         const decreaseNode = nodes[nodeIndex];
         const expectedKeys = expectedAfterDecreases[i];
 
-        expect(decreaseNode).not.toBe(undefined);
+        expect(decreaseNode).not.toBeUndefined();
         expect(Array.isArray(expectedKeys)).toBe(true);
 
         if (decreaseNode && expectedKeys) {
@@ -398,7 +398,7 @@ describe('Core', () => {
           ? nodes.reduce((a, b) => (a.key >= b.key ? a : b))
           : nodes.reduce((a, b) => (a.key <= b.key ? a : b));
 
-      expect(nodes[increaseNodeIndex]).not.toBe(undefined);
+      expect(nodes[increaseNodeIndex]).not.toBeUndefined();
 
       if (nodes[increaseNodeIndex]) {
         expect(
@@ -408,7 +408,7 @@ describe('Core', () => {
         expect(heap.peek(instance)).toBe(extreme());
       }
 
-      expect(nodes[decreaseNodeIndex]).not.toBe(undefined);
+      expect(nodes[decreaseNodeIndex]).not.toBeUndefined();
 
       if (nodes[decreaseNodeIndex]) {
         expect(

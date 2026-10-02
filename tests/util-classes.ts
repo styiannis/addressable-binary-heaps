@@ -13,7 +13,7 @@ export function addAndValidate<H extends MaxHeap | MinHeap>(
   key: number,
   expected: number[]
 ) {
-  expect(instance.add({ key })).toBe(undefined);
+  expect(instance.add({ key })).toBeUndefined();
   expect(heapKeys(instance)).toStrictEqual(expected);
 }
 

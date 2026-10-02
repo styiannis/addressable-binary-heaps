@@ -21,9 +21,9 @@ export function addAndValidate<A extends IHeapArray>(
   expect(isValidHeap(instanceType, instance)).toBe(true);
 
   if ('max-heap' === instanceType) {
-    expect(maxHeap.add(instance, node)).toBe(undefined);
+    expect(maxHeap.add(instance, node)).toBeUndefined();
   } else {
-    expect(minHeap.add(instance, node)).toBe(undefined);
+    expect(minHeap.add(instance, node)).toBeUndefined();
   }
 
   expect(heapKeys(instance)).toStrictEqual(expectedKeys);

@@ -4,6 +4,8 @@ import { getLeftChildIndex, getRightChildIndex } from '../src/core/heap.util';
 const arraysEqual = (a: any[], b: any[]) =>
   a.length === b.length && a.every((val, i) => val === b[i]);
 
+const stringSort = (a: string, b: string) => a.localeCompare(b);
+
 export function isValidObjectInstance(
   instanceType: 'max-heap' | 'min-heap' | 'heap-node',
   instance: unknown
@@ -12,7 +14,7 @@ export function isValidObjectInstance(
     return false;
   }
 
-  const props = Object.getOwnPropertyNames(instance).sort();
+  const props = Object.getOwnPropertyNames(instance).sort(stringSort);
 
   if ('heap-node' === instanceType) {
     return (
@@ -36,9 +38,9 @@ export function isValidClassInstance(
     return false;
   }
 
-  const props = Object.getOwnPropertyNames(instance).sort();
+  const props = Object.getOwnPropertyNames(instance).sort(stringSort);
   const proto = Object.getPrototypeOf(instance);
-  const protoProps = Object.getOwnPropertyNames(proto).sort();
+  const protoProps = Object.getOwnPropertyNames(proto).sort(stringSort);
 
   if (
     !arraysEqual(props, []) ||
