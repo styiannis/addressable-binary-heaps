@@ -3,15 +3,15 @@
 Behaviour that surprises readers of the API, what the library does instead of
 throwing, and the questions the package shape raises.
 
-**Last verified:** 2026-09-21 · v1.2.0
+**Last verified:** 2026-10-07 · v1.2.0
 
 ## Behaviour
 
 ### Why does iterating give me the elements out of order?
 
-Because a heap is not sorted. It is an array in which every element precedes
-its two children, which guarantees the top and nothing else, and iteration
-walks that array from index `0`:
+Because a heap is not sorted. It is an array in which every element ranks at
+least as high as its children, which guarantees the top and nothing else, and
+iteration walks that array from index `0`:
 
 ```typescript
 import { MinHeap } from 'addressable-binary-heaps';
@@ -31,15 +31,21 @@ console.log([...q1].map((t) => t.key)); // [ 1, 3, 8, 5 ]
 console.log(q1.peek()?.key); // 1
 ```
 
-`entries`, `keys`, `forEach` and `for...of` all use the same order. Sorted
-output comes from repeated `pop`, which costs `O(n log n)` and empties the
-heap.
+No other way of iterating changes this: `entries`, `keys`, `forEach` and
+`for...of` all walk the same array in the same order.
+
+The `reversed` argument of the iterators does not sort it either: it walks the
+same array from the end.
+
+Priority order comes from `pop`, which removes and returns the top on every
+call: repeating it until the heap is empty yields every element in order, at a
+total cost of `O(n log n)`.
 
 ### I assigned `node.key` myself and nothing moved
 
-The heap is only notified through `increase` and `decrease`. A direct
-assignment changes the number and leaves the element exactly where it was, so
-the top can end up holding a key that is no longer the smallest:
+The heap is only notified through `increase` and `decrease`. A direct assignment
+changes the number and leaves the element exactly where it was, so the top can
+end up holding a key that is no longer the smallest:
 
 ```typescript
 import { MinHeap } from 'addressable-binary-heaps';
@@ -101,16 +107,16 @@ console.log([...q3.keys()]); // [ -11, 4, 1 ]
 console.log(q3.peek()?.key); // -11
 ```
 
-`increase(node, -20)` and `decrease(node, 20)` produce the same heap.
-`increase` and `decrease` are two names for the same operation — a signed
-change to `key` — kept separate because a caller reasoning about priorities
-usually already knows which direction they mean.
+`increase(node, -20)` and `decrease(node, 20)` produce the same heap. `increase`
+and `decrease` are two names for the same operation — a signed change to `key` —
+kept separate because a caller reasoning about priorities usually already knows
+which direction they mean.
 
 ### Can the same object be in the heap twice?
 
-It can be added twice, and it should not be. The heap tracks positions by
-object identity, so two positions share one recorded index, and an update
-reaches one of them:
+It can be added twice, and it should not be. The heap tracks positions by object
+identity, so two positions share one recorded index, and an update reaches one
+of them:
 
 ```typescript
 import { MinHeap } from 'addressable-binary-heaps';
@@ -138,8 +144,8 @@ console.log([...q5].map((t) => `${t.id}:${t.key}`));
 ```
 
 The copy at index `4` now holds a key smaller than its parent at index `1`,
-which breaks the invariant. If a job can be queued more than once, give
-each occurrence its own object.
+which breaks the invariant. If a job can be queued more than once, give each
+occurrence its own object.
 
 ### Can one object be in two heaps at once?
 
@@ -178,15 +184,14 @@ console.log([...b].map((t) => `${t.id}:${t.key}`)); // [ 'b1:3', 'shared:1' ]
 console.log(b.peek()?.id); // b1
 ```
 
-`b` reports `b1` as its minimum while holding an element with a lower key.
-An element belongs to one heap at a time; use a second object for the second
-heap.
+`b` reports `b1` as its minimum while holding an element with a lower key. An
+element belongs to one heap at a time; use a second object for the second heap.
 
 ### How do I check whether an element is still in the heap?
 
 There is no `has`. The class API answers only indirectly. `remove`, `increase`
-and `decrease` all return `false` for an element the heap does not hold, and
-the two that would otherwise write to `key` leave it untouched:
+and `decrease` all return `false` for an element the heap does not hold, and the
+two that would otherwise write to `key` leave it untouched:
 
 ```typescript
 import { MinHeap } from 'addressable-binary-heaps';
@@ -212,8 +217,9 @@ subclass `MinHeap` and maintain one — see
 
 ### Can I pop or remove while iterating?
 
-No. The iterator walks the array by index, and both operations move the last
-element into a vacated position, so elements shift under the walk:
+No. The iterator walks the array by index. `pop` and `remove` fill the position
+they empty with the last element of the array, unless that element is the one
+they take. Elements therefore shift under the walk:
 
 ```typescript
 import { MinHeap } from 'addressable-binary-heaps';
@@ -247,8 +253,7 @@ mutate afterwards — `[...heap]` gives you a snapshot to iterate safely.
 ### What does `clear()` do to my objects?
 
 It empties the heap and forgets every recorded position. Your objects are
-untouched, including their `key` values, and the heap no longer recognises
-them:
+untouched, including their `key` values, and the heap no longer recognises them:
 
 ```typescript
 import { MinHeap } from 'addressable-binary-heaps';
@@ -269,13 +274,6 @@ q7.clear();
 console.log(q7.size, q7.peek()); // 0 undefined
 console.log(kept.key, q7.remove(kept)); // 2 false
 ```
-
-### What is `reversed` reversing?
-
-The array, not the priority. `[...heap[Symbol.iterator](true)]` walks from the
-last index to the first, which in a min-heap is neither descending nor
-ascending order. `for...of` and the spread form invoke the iterator with no
-argument, so the flag has to be passed explicitly to have any effect.
 
 ### Do elements with equal keys come out in insertion order?
 
@@ -300,8 +298,8 @@ console.log([q10.pop()?.id, q10.pop()?.id, q10.pop()?.id, q10.pop()?.id]);
 // [ 'p', 's', 'r', 'q' ]
 ```
 
-For FIFO among equal priorities, fold a sequence counter into the key so that
-no two elements compare equal:
+For FIFO among equal priorities, fold a sequence counter into the key so that no
+two elements compare equal:
 
 ```typescript
 import { MinHeap } from 'addressable-binary-heaps';
@@ -323,6 +321,10 @@ const q11 = new MinHeap<Task>();
 console.log([q11.pop()?.id, q11.pop()?.id, q11.pop()?.id, q11.pop()?.id]);
 // [ 'p', 'q', 'r', 's' ]
 ```
+
+_Note:_ The factor `1e6` is a limit: with integer priorities, the order holds
+for the first million insertions, after which the counter can push a key past
+those of the next priority.
 
 ### `remove()` returned `false` for something I know I added
 
@@ -399,8 +401,8 @@ A key that is not a number, `NaN` included, is a different matter — see
 ## What happens instead of an error
 
 Nothing in `src/` throws. There is no validation layer and no `TypeError` to
-catch, which keeps each operation to the comparisons and swaps it describes
-and makes misuse silent rather than loud. These are the cases worth knowing:
+catch, which keeps each operation to the comparisons and swaps it describes and
+makes misuse silent rather than loud. These are the cases worth knowing:
 
 | Call                                                    | Result                                                                                                                            |
 | ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
@@ -417,14 +419,15 @@ nothing in the API says so.
 
 The last row is the widest. The heap only ever applies `<`, `>`, `<=` and `>=`
 to keys, so a key that is not a number is still ordered — by whatever those
-operators do with it. They may coerce it to a number, compare it as
-text, or never return `true` at all.
+operators do with it. They may coerce it to a number, compare it as text, or
+never return `true` at all.
 
 `NaN` is that last case, and it is the worst of them. The rebalancing never
 finds its stop condition, so the node moves at every comparison it takes part
 in: to the root on `add`, back down a level as later insertions climb past it,
-and to the root once more on `increase` or `decrease`. Its position is
-undefined, not merely wrong. Keep keys to numbers other than `NaN`.
+and, on `increase` or `decrease`, down to a leaf if it has children or up to
+the root if it has none. Its position is undefined, not merely wrong. Keep keys
+to numbers other than `NaN`.
 
 ## Environment and integration
 
@@ -440,8 +443,8 @@ Both. `import` resolves to `dist/es/index.mjs` and `require` to
 `dist/cjs/index.cjs`, each with its own declarations —
 `dist/@types/es/index.d.mts` and `dist/@types/cjs/index.d.cts` — emitted from
 the same source by the same build. The module system is carried by the file
-extension rather than inferred from a `type` field, so Node reads each build
-as what it is and neither path prints a warning.
+extension rather than inferred from a `type` field, so Node reads each build as
+what it is and neither path prints a warning.
 
 ### Can I import only part of the library?
 
@@ -453,14 +456,17 @@ import * as maxHeap from 'addressable-binary-heaps/max-heap';
 ```
 
 Those are the only subpaths. `MinHeap`, `MaxHeap`, `AbstractHeap` and the
-interfaces are available from the package root.
+types `IHeapNode` and `IHeapArray` are available from the package root.
+
+TypeScript resolves the subpaths only when `moduleResolution` is `node16`,
+`nodenext` or `bundler`. If your configuration uses `node10`, which is what
+`module: commonjs` selects by default, import from the package root instead.
 
 ### Will unused parts be dropped from my bundle?
 
-The package declares `"sideEffects": false` and ships an ES build that keeps
-one module per source file, so a bundler that performs tree-shaking removes
-what you do not import. Importing `MinHeap` alone does not pull in the
-max-heap module.
+The package declares `"sideEffects": false` and ships an ES build that keeps one
+module per source file, so a bundler that performs tree-shaking removes what you
+do not import. Importing `MinHeap` alone does not pull in the max-heap module.
 
 ### What does it depend on at runtime?
 

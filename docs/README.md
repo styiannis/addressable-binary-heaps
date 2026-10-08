@@ -6,5 +6,6 @@
 | [FAQ](faq.md)                                   | It did something I did not expect — why?         |
 | [Architecture and API](architecture-and-api.md) | How is the library built, and what can I extend? |
 
-The generated [API reference](https://styiannis.github.io/addressable-binary-heaps/)
-lists every signature and every type.
+The generated
+[API reference](https://styiannis.github.io/addressable-binary-heaps/) lists
+every signature and every type.

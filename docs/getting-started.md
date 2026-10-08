@@ -3,7 +3,7 @@
 From an empty project to a priority queue you can add to, take from, reorder
 while it is full, and cancel out of.
 
-**Last verified:** 2026-09-21 · v1.2.0 · Node ≥ 18.12
+**Last verified:** 2026-10-07 · v1.2.0 · Node ≥ 18.12
 
 ## Install
 
@@ -11,9 +11,9 @@ while it is full, and cancel out of.
 npm install addressable-binary-heaps
 ```
 
-The package has no runtime dependencies. It ships an ES build, a CommonJS
-build and type definitions, so TypeScript needs no additional configuration
-and JavaScript works with either module system.
+The package has no runtime dependencies. It ships an ES build, a CommonJS build
+and type definitions, so TypeScript needs no additional configuration and
+JavaScript works with either module system.
 
 ## Put your own objects in a heap
 
@@ -116,8 +116,8 @@ console.log(compile.key, queue.peek()?.id); // 103 deploy
 console.log(queue.decrease(new Task('stranger', 0), 1)); // false
 ```
 
-`decrease` subtracts the amount from `key` and `increase` adds it, and both
-then move the element in whichever direction its new key belongs. Both take the
+`decrease` subtracts the amount from `key` and `increase` adds it, and both then
+move the element in whichever direction its new key belongs. Both take the
 element, not an index or a handle, and both return `false` if the heap does not
 hold it, as the last call above shows for an element that was never added.
 
@@ -146,15 +146,15 @@ console.log(batch.remove(lint), batch.size); // true 2
 console.log(batch.remove(lint)); // false
 ```
 
-The second call is `false` because the first one removed the element and
-forgot its position. That is what makes `remove` safe to call speculatively on
-an element you are not sure is still queued.
+The second call is `false` because the first one removed the element and forgot
+its position. That is what makes `remove` safe to call speculatively on an
+element you are not sure is still queued.
 
 ## Iterate, knowing what the order is
 
 A heap is iterable, and the order it iterates in is not necessarily the order
-elements leave it in. A binary heap is stored as an array in which every
-element precedes its children, which is weaker than sorted: the top is
+elements leave it in. A binary heap is stored as an array in which every element
+ranks at least as high as its children, which is weaker than sorted: the top is
 guaranteed, the rest is not.
 
 ```typescript
@@ -176,8 +176,8 @@ console.log([...jobs[Symbol.iterator](true)].map((t) => t.key)); // [ 5, 8, 3, 1
 ```
 
 The argument reverses the array, not the priority. `for...of` and the spread
-form call the iterator with no argument, so pass it explicitly when you want
-the other direction, as the second line does. `entries(reversed?)`,
+form call the iterator with no argument, so pass it explicitly when you want the
+other direction, as the second line does. `entries(reversed?)`,
 `keys(reversed?)` and `forEach(callback, thisArg?)` walk the same array in the
 same order.
 
@@ -230,18 +230,22 @@ console.log(scores.peek()?.id); // bob
 console.log(scores.increase(scores.peek()!, 9), scores.peek()?.key); // true 100
 ```
 
-`increase` and `decrease` keep their names in both classes, so a positive
-amount passed to `increase` moves an element towards the top of a `MaxHeap` and
-away from the top of a `MinHeap`.
+`increase` and `decrease` keep their names in both classes, so a positive amount
+passed to `increase` moves an element towards the top of a `MaxHeap` and away
+from the top of a `MinHeap`.
 
 ## Work without classes
 
-The classes delegate to a layer of functions over a plain array, and that
-layer is exported. Reach for it when you are managing many short-lived heaps
-and want no prototypes involved, or when you want to access the array itself.
+The classes delegate to a layer of functions over a plain array, and that layer
+is exported. Reach for it when you want no class instance per heap, or when
+you want to read the array itself.
 
 ```typescript
-import { minHeap, IHeapArray, IHeapNode } from 'addressable-binary-heaps';
+import {
+  minHeap,
+  type IHeapArray,
+  type IHeapNode,
+} from 'addressable-binary-heaps';
 
 interface Entry extends IHeapNode {
   path: string;
@@ -275,4 +279,4 @@ functions with the comparison reversed.
 happens when you write `key` yourself, when the same object is added twice, and
 which module system resolves to which build.
 [architecture-and-api.md](architecture-and-api.md) explains what the index map
-costs, in bytes and in insertion time, and what the abstract class is for.
+costs, in memory and in time, and what the abstract class is for.

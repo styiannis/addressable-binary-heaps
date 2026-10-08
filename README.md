@@ -6,8 +6,8 @@
 Min-heaps and max-heaps for TypeScript in which **your object is the element**.
 The heap keeps track of every element's position, so raising or lowering an
 element's priority, or taking it out of the queue entirely, never begins with a
-search for it, whether you use the classes or the plain functions they are
-built on.
+search for it, whether you use the classes or the plain functions they are built
+on.
 
 ## Install
 
@@ -95,17 +95,22 @@ to scan its array before it can act on a given element, and an array kept sorted
 has to shift everything past the position that changed. The gap between those
 two and this heap grows with the size of the structure.
 [The architecture write-up](https://github.com/styiannis/addressable-binary-heaps/blob/main/docs/architecture-and-api.md#what-the-addressing-costs)
-measures all three, along with what the map itself costs.
+compares all three, and gives what the map itself costs.
 
 ## The same heaps as plain functions
 
 The classes delegate to a layer of plain functions over a plain array, and that
 layer is exported as `minHeap` and `maxHeap`. A heap built by it is an ordinary
-`Array` carrying an `indices` property, so everything `Array` offers still works
-on it:
+`Array` carrying an `indices` property. `Array` methods that read it work as
+usual, as `map` does below; methods that write to it, such as `push` or `sort`,
+bypass the index map and break the heap.
 
 ```typescript
-import { minHeap, IHeapArray, IHeapNode } from 'addressable-binary-heaps';
+import {
+  minHeap,
+  type IHeapArray,
+  type IHeapNode,
+} from 'addressable-binary-heaps';
 
 interface Entry extends IHeapNode {
   path: string;
@@ -176,33 +181,33 @@ functional counterpart, shown here for `minHeap` and identical for `maxHeap`:
 | `forEach(callback, thisArg?)`  | —                                   | `O(n)`                      |
 | `[Symbol.iterator](reversed?)` | —                                   | `O(1)` call, `O(n)` drained |
 
-The three generators cost nothing until something consumes them; `forEach`
-walks the array on the call. All four follow the underlying array rather than
-priority order.
+The three generators walk the array only as they are consumed; `forEach` walks
+all of it on the call. All four follow the underlying array rather than priority
+order.
 
 Nothing in the library throws. A call that cannot find its element returns
 `false`, and `peek` or `pop` on an empty heap returns `undefined`.
 
 ## When not to use it
 
-Addressing is not free: it costs memory for every element held and time on
-every insertion. What follows are the cases where nothing is bought with it.
+Addressing requires memory for every element held, and time whenever an element
+enters, moves or leaves. The cases below gain nothing from it.
 
 | If this describes the problem                      | Reach for                                                                                                                                      |
 | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Only `add` and `pop`; priorities never move        | a binary heap without addressing — the index map would be paid for and never used                                                              |
-| The whole order, once, over a set already complete | `Array.prototype.sort`, which is both faster here and the shorter program                                                                      |
+| Only `add` and `pop`; priorities never move        | a binary heap without addressing — the index map would be maintained and never read                                                            |
+| The whole order, once, over a set already complete | `Array.prototype.sort`, which reaches the same order without a structure to maintain, in a shorter program                                     |
 | Ordering by something other than a number          | a heap that takes a comparator — `key` is typed `number` and compared with `<`, `>`, `<=` and `>=`, and there is no comparator parameter       |
 | Frequent membership tests                          | a `Set` maintained beside the heap — there is no `has`, and a `false` from `remove`, `increase` or `decrease` is the only signal the API gives |
 | One element queued in two structures at once       | a separate object per structure — `increase` and `decrease` write to `node.key`, and the other heap is never told it changed                   |
 
 ## Documentation
 
-- [Guides, the FAQ and the architecture write-up](https://github.com/styiannis/addressable-binary-heaps/tree/main/docs) —
-  getting a heap running, the behaviour that surprises people, and how the
-  library is built, including what the addressing measurably costs.
-- [The generated API reference](https://styiannis.github.io/addressable-binary-heaps/) —
-  every signature and every type.
+- [Guides, the FAQ and the architecture write-up](https://github.com/styiannis/addressable-binary-heaps/tree/main/docs)
+  — getting a heap running, the behaviour that surprises people, and how the
+  library is built, including what the addressing costs.
+- [The generated API reference](https://styiannis.github.io/addressable-binary-heaps/)
+  — every signature and every type.
 - [Open an issue](https://github.com/styiannis/addressable-binary-heaps/issues)
   for a question or a bug report.
 
