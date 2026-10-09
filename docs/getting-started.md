@@ -3,7 +3,7 @@
 From an empty project to a priority queue you can add to, take from, reorder
 while it is full, and cancel out of.
 
-**Last verified:** 2026-10-07 · v1.2.0 · Node ≥ 18.12
+**Last verified:** 2026-10-09 · v1.3.0 · Node ≥ 18.12
 
 ## Install
 
@@ -53,7 +53,7 @@ reversed.
 ## Take from the top
 
 `peek` reads the top without disturbing it, and `pop` removes and returns it.
-Both are `undefined` on an empty heap — the library does not throw.
+Both return `undefined` on an empty heap rather than throwing.
 
 ```typescript
 import { MinHeap } from 'addressable-binary-heaps';
@@ -119,7 +119,9 @@ console.log(queue.decrease(new Task('stranger', 0), 1)); // false
 `decrease` subtracts the amount from `key` and `increase` adds it, and both then
 move the element in whichever direction its new key belongs. Both take the
 element, not an index or a handle, and both return `false` if the heap does not
-hold it, as the last call above shows for an element that was never added.
+hold it, as the last call above shows for an element that was never added. They
+also return `false`, and leave `key` unchanged, when the amount is not a finite
+number.
 
 ## Cancel an element from anywhere
 
@@ -275,7 +277,7 @@ functions with the comparison reversed.
 
 ## What this page did not cover
 
-[faq.md](faq.md) covers the behaviour this page has only pointed at — what
+[faq.md](faq.md) covers the behaviour this page has not reached — what
 happens when you write `key` yourself, when the same object is added twice, and
 which module system resolves to which build.
 [architecture-and-api.md](architecture-and-api.md) explains what the index map

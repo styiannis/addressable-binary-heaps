@@ -1,6 +1,6 @@
 # Architecture and API
 
-**Last verified:** 2026-10-07 · v1.2.0
+**Last verified:** 2026-10-09 · v1.3.0
 
 ## One numeric field as the whole contract
 
@@ -49,8 +49,9 @@ the memory the heap itself uses.
 
 **Time.** Every swap also writes the new positions of both elements into the
 map, so every rebalance does more work than in the same heap without it. The
-extra work is constant per swap, so every operation stays `O(log n)`. `add` and
-`pop` update the map as well, although neither of them reads from it.
+extra work is constant per swap, so every operation stays `O(log n)`. `pop`
+updates the map as well, without reading from it, and `add` reads it once, to
+ignore an element the heap already holds.
 
 **What it provides.** `remove`, `increase` and `decrease` start from an element,
 not from the top, and the map is what lets them find it in `O(1)`. Without it,
@@ -84,7 +85,7 @@ The `classes/` layer contains no algorithm. `MinHeap.pop` is
 `return minHeap.pop(this.#heap)`, and every method but `forEach` follows the
 same pattern. What the layer adds is the generic parameter that carries your
 element type through the API, the `Symbol.iterator` implementation, `forEach`,
-and prototypes for code that prefers them.
+and method-call syntax for code that prefers it.
 
 The two layers do not mix on one heap. A `MinHeap` keeps its array in a `#heap`
 private field and is not itself an `IHeapArray`, so the core functions cannot be
@@ -131,9 +132,9 @@ minus `create`, which the constructor replaces, plus `forEach` and
 
 `create` without `initialNodes` returns an empty heap in `O(1)`. With
 `initialNodes`, it builds the heap in `O(n)` using Floyd's bottom-up heapify:
-the elements are placed in the array as given, then every parent is heapified
-down, from the last one back to the root. Adding the same elements one at a time
-would cost `O(n log n)`.
+the elements are placed in the array in the order given, each once, then every
+parent is heapified down, from the last one back to the root. Adding the same
+elements one at a time would cost `O(n log n)`.
 
 `clear` is linear rather than constant. The index map is a `WeakMap`, which has
 no `clear` method, so each element's entry is deleted one at a time before the
