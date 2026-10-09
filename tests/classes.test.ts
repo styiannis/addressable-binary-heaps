@@ -375,6 +375,71 @@ describe('Classes', () => {
   );
 
   it.each([
+    ['MaxHeap' as const, MaxHeap],
+    ['MinHeap' as const, MinHeap],
+  ])(
+    '[%s] Constructor skips holes and ignores a value that is not an array',
+    (classInstanceType, Heap) => {
+      const instanceType = toCoreInstanceType(classInstanceType);
+      const nodes = [3, 1, 2].map((key) => ({ key }));
+      const sparse: typeof nodes = [];
+
+      nodes.forEach((node, i) => (sparse[2 * i] = node)); // Holes at 1 and 3.
+
+      const instance = new Heap(sparse);
+
+      expect(instance.size).toBe(3);
+      expect(isValidHeap(instanceType, [...instance])).toBe(true);
+
+      [new Set(nodes), new Map(nodes.map((n, i) => [i, n])), 'ab', 5].forEach(
+        (value) => {
+          const ignored = new Heap(value as unknown as typeof nodes);
+
+          expect(isValidEmptyHeap(ignored)).toBe(true);
+        }
+      );
+    }
+  );
+
+  it.each([
+    ['MaxHeap' as const, MaxHeap],
+    ['MinHeap' as const, MinHeap],
+  ])(
+    '[%s] Increase and decrease throw on a key that is not writable',
+    (classInstanceType, Heap) => {
+      const instanceType = toCoreInstanceType(classInstanceType);
+
+      const frozen = Object.freeze({ key: 3 });
+
+      const getterOnly = {
+        get key() {
+          return 4;
+        },
+      };
+
+      const instance = new Heap([
+        ...[1, 2, 5].map((key) => ({ key })),
+        frozen,
+        getterOnly,
+      ]);
+
+      const order = [...instance];
+
+      [frozen, getterOnly].forEach((node) => {
+        const key = node.key;
+
+        expect(() => instance.increase(node, 10)).toThrow(TypeError);
+        expect(() => instance.decrease(node, 10)).toThrow(TypeError);
+        expect(node.key).toBe(key);
+      });
+
+      [...instance].forEach((node, i) => expect(node).toBe(order[i]));
+
+      expect(isValidHeap(instanceType, [...instance])).toBe(true);
+    }
+  );
+
+  it.each([
     [
       'MaxHeap' as const,
       MaxHeap,

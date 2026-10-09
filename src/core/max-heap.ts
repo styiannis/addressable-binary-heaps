@@ -42,6 +42,7 @@ function heapifyDown<H extends IHeapArray>(instance: H, index: number) {
   }
 
   swapHeapNodes(instance, index, higherKeyChildIndex);
+
   heapifyDown(instance, higherKeyChildIndex);
 }
 
@@ -64,6 +65,7 @@ function heapifyUp<H extends IHeapArray>(instance: H, index: number) {
   }
 
   swapHeapNodes(instance, index, pi);
+
   heapifyUp(instance, pi);
 }
 
@@ -76,15 +78,18 @@ function heapifyUp<H extends IHeapArray>(instance: H, index: number) {
  *
  * @typeParam H - The type of max-heap array.
  * @param [initialNodes] - Array of unsorted heap elements to initialize with.
+ *        An element that appears more than once is added once.
+ *        A value that is not an array is ignored.
  * @returns A new max-heap instance.
  */
 export function create<H extends IHeapArray>(
   initialNodes?: H[number][] | Readonly<H[number][]>
 ) {
   const instance = [] as unknown as H;
+
   instance.indices = new WeakMap();
 
-  if (initialNodes) {
+  if (Array.isArray(initialNodes)) {
     buildHeap(instance, initialNodes, heapifyDown);
   }
 
@@ -115,12 +120,17 @@ export function size<H extends IHeapArray>(instance: H) {
 /**
  * Adds a new element to the max-heap while maintaining the heap property.
  * The element is initially added at the end and then heapified up as needed.
+ * An element the heap already holds is ignored, and the heap is unchanged.
  *
  * @typeParam H - The type of max-heap array.
  * @param instance - The max-heap instance.
  * @param node - The new element to add.
  */
 export function add<H extends IHeapArray>(instance: H, node: H[number]) {
+  if (instance.indices.has(node)) {
+    return;
+  }
+
   instance.indices.set(node, instance.length);
   instance.push(node);
   heapifyUp(instance, instance.length - 1);
@@ -192,9 +202,12 @@ export function remove<H extends IHeapArray>(instance: H, node: H[number]) {
   }
 
   swapHeapNodes(instance, index, instance.length - 1);
+
   const deleted = instance.indices.delete(instance.pop() as H[number]);
+
   heapifyDown(instance, index);
   heapifyUp(instance, index);
+
   return deleted;
 }
 
@@ -207,7 +220,12 @@ export function remove<H extends IHeapArray>(instance: H, node: H[number]) {
  * @param instance - The max-heap instance.
  * @param node - The element to modify.
  * @param increaseValue - Amount to increase the key by.
- * @returns `true` if element was found and modified, `false` otherwise.
+ * @returns `true` if element was found and modified,
+ *          `false` if the heap does not hold it or the amount is not a finite
+ *          number (`key` is then unchanged).
+ * @throws `TypeError` if `node.key` is not writable, as on a frozen node
+ *         or a `key` with a getter and no setter. The heap and `key` are
+ *         then unchanged.
  */
 export function increase<H extends IHeapArray>(
   instance: H,
@@ -216,11 +234,12 @@ export function increase<H extends IHeapArray>(
 ) {
   const index = instance.indices.get(node);
 
-  if (undefined === index) {
+  if (undefined === index || !Number.isFinite(increaseValue)) {
     return false;
   }
 
   node.key += increaseValue;
+
   heapifyDown(instance, index);
   heapifyUp(instance, index);
 
@@ -236,7 +255,12 @@ export function increase<H extends IHeapArray>(
  * @param instance - The max-heap instance.
  * @param node - The element to modify.
  * @param decreaseValue - Amount to decrease the key by.
- * @returns `true` if element was found and modified, `false` otherwise.
+ * @returns `true` if element was found and modified,
+ *          `false` if the heap does not hold it or the amount is not a finite
+ *          number (`key` is then unchanged).
+ * @throws `TypeError` if `node.key` is not writable, as on a frozen node
+ *         or a `key` with a getter and no setter. The heap and `key` are
+ *         then unchanged.
  */
 export function decrease<H extends IHeapArray>(
   instance: H,
@@ -245,11 +269,12 @@ export function decrease<H extends IHeapArray>(
 ) {
   const index = instance.indices.get(node);
 
-  if (undefined === index) {
+  if (undefined === index || !Number.isFinite(decreaseValue)) {
     return false;
   }
 
   node.key -= decreaseValue;
+
   heapifyDown(instance, index);
   heapifyUp(instance, index);
 

@@ -18,6 +18,8 @@ export class MaxHeap<N extends IHeapNode = IHeapNode> extends AbstractHeap<N> {
    * Creates a new `MaxHeap` instance.
    *
    * @param [initialNodes] - Optional array of elements to initialize the heap with.
+   *        An element that appears more than once is added once.
+   *        A value that is not an array is ignored.
    */
   constructor(initialNodes?: N[] | Readonly<N[]>) {
     super();
@@ -47,6 +49,7 @@ export class MaxHeap<N extends IHeapNode = IHeapNode> extends AbstractHeap<N> {
 
   /**
    * Adds a new element to the heap while maintaining the max-heap property.
+   * An element the heap already holds is ignored, and the heap is unchanged.
    *
    * @param node - The element to add to the heap.
    */
@@ -66,7 +69,12 @@ export class MaxHeap<N extends IHeapNode = IHeapNode> extends AbstractHeap<N> {
    *
    * @param node - The element to modify.
    * @param decreaseValue - Amount to decrease the key by.
-   * @returns `true` if element was found and modified, `false` otherwise.
+   * @returns `true` if element was found and modified,
+   *          `false` if the heap does not hold it or the amount is not a
+   *          finite number (`key` is then unchanged).
+   * @throws `TypeError` if `node.key` is not writable, as on a frozen node
+   *         or a `key` with a getter and no setter. The heap and `key` are
+   *         then unchanged.
    */
   decrease(node: N, decreaseValue: number) {
     return maxHeap.decrease(this.#heap, node, decreaseValue);
@@ -111,7 +119,12 @@ export class MaxHeap<N extends IHeapNode = IHeapNode> extends AbstractHeap<N> {
    *
    * @param node - The element to modify.
    * @param increaseValue - Amount to increase the key by.
-   * @returns `true` if element was found and modified, `false` otherwise.
+   * @returns `true` if element was found and modified,
+   *          `false` if the heap does not hold it or the amount is not a
+   *          finite number (`key` is then unchanged).
+   * @throws `TypeError` if `node.key` is not writable, as on a frozen node
+   *         or a `key` with a getter and no setter. The heap and `key` are
+   *         then unchanged.
    */
   increase(node: N, increaseValue: number) {
     return maxHeap.increase(this.#heap, node, increaseValue);

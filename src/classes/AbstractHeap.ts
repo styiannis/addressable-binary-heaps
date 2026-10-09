@@ -27,6 +27,9 @@ export abstract class AbstractHeap<N extends IHeapNode = IHeapNode> {
 
   /**
    * Adds a new node to the heap while maintaining the heap property.
+   * An implementation is expected to ignore a node the heap already holds and
+   * leave the heap unchanged, as `MinHeap` and `MaxHeap` do. This class does
+   * not enforce it.
    *
    * @param node - The node to add to the heap.
    */
@@ -42,7 +45,12 @@ export abstract class AbstractHeap<N extends IHeapNode = IHeapNode> {
    *
    * @param node - The element to modify.
    * @param decreaseValue - Amount to decrease the key by.
-   * @returns `true` if element was found and modified, `false` otherwise.
+   * @returns `true` if element was found and modified,
+   *          `false` if the heap does not hold it or the amount is not a
+   *          finite number (`key` is then unchanged).
+   * @throws `TypeError` if `node.key` is not writable, as on a frozen node
+   *         or a `key` with a getter and no setter. The heap and `key` are
+   *         then unchanged.
    */
   abstract decrease(node: N, decreaseValue: N['key']): boolean;
 
@@ -79,7 +87,12 @@ export abstract class AbstractHeap<N extends IHeapNode = IHeapNode> {
    *
    * @param node - The element to modify.
    * @param increaseValue - Amount to increase the key by.
-   * @returns `true` if element was found and modified, `false` otherwise.
+   * @returns `true` if element was found and modified,
+   *          `false` if the heap does not hold it or the amount is not a
+   *          finite number (`key` is then unchanged).
+   * @throws `TypeError` if `node.key` is not writable, as on a frozen node
+   *         or a `key` with a getter and no setter. The heap and `key` are
+   *         then unchanged.
    */
   abstract increase(node: N, increaseValue: N['key']): boolean;
 
