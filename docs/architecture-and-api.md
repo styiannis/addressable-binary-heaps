@@ -1,6 +1,6 @@
 # Architecture and API
 
-**Last verified:** 2026-10-09 · v1.3.0
+**Last verified:** 2026-10-13 · v1.3.0
 
 ## One numeric field as the whole contract
 
@@ -44,12 +44,12 @@ element no longer has to search for it.
 **Memory.** The map is the only structure addressing adds; the array is the
 heap itself, and every binary heap has one. The map holds one entry per
 element, and each entry stores both the element and its index, where the array
-slot beside it stores only the element. The map therefore accounts for most of
-the memory the heap itself uses.
+stores only the element. The map therefore accounts for most of the memory the
+heap itself uses.
 
 **Time.** Every swap also writes the new positions of both elements into the
 map, so every rebalance does more work than in the same heap without it. The
-extra work is constant per swap, so every operation stays `O(log n)`. `pop`
+extra work is constant per swap, so it changes no operation's bound. `pop`
 updates the map as well, without reading from it, and `add` reads it once, to
 ignore an element the heap already holds.
 
@@ -70,14 +70,15 @@ classes and the generics sit on top of that layer rather than inside it.
 
 ```
 src/
+├── classes/
+│   ├── AbstractHeap.ts  the abstract surface
+│   ├── MaxHeap.ts       delegates to max-heap.ts
+│   └── MinHeap.ts       delegates to min-heap.ts
 ├── core/
 │   ├── heap.ts          clear, size, peek, entries, keys — shared by both
 │   ├── heap.util.ts     buildHeap, parent/child indices, swapHeapNodes
-│   ├── min-heap.ts      heapifyUp, heapifyDown, and the public functions
-│   └── max-heap.ts      the same, with the comparisons reversed
-├── classes/
-│   ├── AbstractHeap.ts  the abstract surface
-│   └── {Min,Max}Heap.ts
+│   ├── max-heap.ts      heapifyUp, heapifyDown, and the public functions
+│   └── min-heap.ts      the same, with the comparisons reversed
 └── types.ts             IHeapNode, IHeapArray
 ```
 
@@ -92,9 +93,8 @@ private field and is not itself an `IHeapArray`, so the core functions cannot be
 applied to it. The layer is chosen per heap.
 
 `min-heap.ts` and `max-heap.ts` are near-duplicates on purpose. Their `heapify`
-helpers differ only in the comparison operators, and writing each file out in
-full keeps the cost of every function readable in the file itself. What the two
-share lives in `heap.ts` and `heap.util.ts`.
+helpers differ only in the comparison operators. What the two share lives in
+`heap.ts` and `heap.util.ts`.
 
 ## The public surface
 
@@ -157,8 +157,8 @@ Three routes, for three different intentions.
 **Subclass a concrete class** when the structure is right and the API is missing
 something. A membership test is one such addition, and one a subclass cannot
 answer from the heap itself. The index map sits behind the `#heap` private
-field, so the set has to be maintained beside the heap rather than read out of
-it:
+field, so membership has to be tracked in a `Set` maintained beside the heap
+rather than read out of it:
 
 ```typescript
 import { MinHeap, type IHeapNode } from 'addressable-binary-heaps';

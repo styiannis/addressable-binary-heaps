@@ -3,7 +3,7 @@
 From an empty project to a priority queue you can add to, take from, reorder
 while it is full, and cancel out of.
 
-**Last verified:** 2026-10-09 · v1.3.0 · Node ≥ 18.12
+**Last verified:** 2026-10-13 · v1.3.0 · Node ≥ 18.12
 
 ## Install
 
@@ -76,8 +76,8 @@ console.log(drained.pop(), drained.peek(), drained.size); // undefined undefined
 ```
 
 The constructor takes an optional array of elements and builds the heap from it
-in `O(n)`, rather than adding them one at a time. The order they arrive in does
-not matter; the order they leave in is priority order.
+in `O(n)`. The order they arrive in does not matter; they leave through `pop`
+in priority order.
 
 ## Change a priority while the element is queued
 
@@ -155,9 +155,9 @@ element you are not sure is still queued.
 ## Iterate, knowing what the order is
 
 A heap is iterable, and the order it iterates in is not necessarily the order
-elements leave it in. A binary heap is stored as an array in which every element
-ranks at least as high as its children, which is weaker than sorted: the top is
-guaranteed, the rest is not.
+elements leave it in. A `MinHeap`, such as the one below, is stored as an array
+in which no element has a key greater than its children's. That is weaker than
+sorted: it places the smallest key at the top but leaves the rest unsorted.
 
 ```typescript
 import { MinHeap } from 'addressable-binary-heaps';
@@ -183,7 +183,7 @@ other direction, as the second line does. `entries(reversed?)`,
 `keys(reversed?)` and `forEach(callback, thisArg?)` walk the same array in the
 same order.
 
-Sorted output comes from draining, and it costs `O(n log n)`:
+Sorted output comes from draining:
 
 ```typescript
 import { MinHeap } from 'addressable-binary-heaps';

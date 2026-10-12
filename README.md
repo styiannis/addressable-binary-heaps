@@ -5,7 +5,7 @@
 
 Min-heaps and max-heaps for TypeScript in which **your object is the element**.
 The heap keeps track of every element's position, so raising or lowering an
-element's priority, or taking it out of the queue entirely, never begins with a
+element's priority, or taking it out of the heap entirely, never begins with a
 search for it, whether you use the classes or the plain functions they are built
 on.
 
@@ -16,8 +16,8 @@ npm install addressable-binary-heaps
 ```
 
 `yarn add` and `pnpm add` work the same way. The package requires Node 18.12 or
-later, as its `engines` field declares, and ships an ES build and a CommonJS
-build with type definitions for each.
+later, and ships an ES build and a CommonJS build with type definitions for
+each.
 
 ## Your object is the element
 
@@ -77,7 +77,7 @@ const alerts = new MaxHeap([
 
 console.log(alerts.peek()?.name); // network
 
-// The lowest element becomes the highest, without being removed and re-added.
+// `disk`, the lowest key, moves to the top without being removed and re-added.
 alerts.increase(disk, 10);
 console.log(alerts.peek()?.name, disk.key); // disk 12
 

@@ -3,27 +3,21 @@
 Behaviour that surprises readers of the API, how a failed call is reported, and
 the questions the package shape raises.
 
-**Last verified:** 2026-10-09 · v1.3.0
+**Last verified:** 2026-10-13 · v1.3.0
 
 ## Behaviour
 
-### Why does iterating give me the elements out of order?
+### Does the heap copy my objects?
 
-Because a heap is not sorted. Every way of iterating it — `for...of`, `entries`,
-`keys` and `forEach` — walks the array the heap is stored in, from index `0`,
-and the `reversed` argument walks the same array from the end.
-[Getting started](getting-started.md#iterate-knowing-what-the-order-is) explains
-why that array guarantees only its top, and shows four elements iterated in
-array order and then drained in priority order.
-
-Priority order comes from `pop`, repeated until the heap is empty, at a total
-cost of `O(n log n)`.
+No. It stores references and reads `key` to order them, and `increase` and
+`decrease` write to that same field on your object. Everything else is yours,
+untouched, and the object you get from `peek` or `pop` is the one you put in.
 
 ### I assigned `node.key` myself and nothing moved
 
 The heap is only notified through `increase` and `decrease`. A direct assignment
-changes the number and leaves the element exactly where it was, so the top can
-end up holding a key that is no longer the smallest:
+changes the number and leaves the element exactly where it was, so the top of
+the `MinHeap` below can end up holding a key that is no longer the smallest:
 
 ```typescript
 import { MinHeap } from 'addressable-binary-heaps';
@@ -49,9 +43,10 @@ console.log(q1.peek()?.id); // a
 console.log([...q1.keys()]); // [ 1, 4, 0 ]
 ```
 
-Use `q1.decrease(late, 9)` instead of `late.key = 0`. If the new priority is
-computed rather than known as a delta, `decrease(node, node.key - next)`
-expresses it without leaving the API.
+Use `q1.decrease(late, 9)` instead of `late.key = 0`. To set the key to a new
+value `next`, rather than change it by an amount, call
+`decrease(node, node.key - next)`, which subtracts the difference between the
+current key and `next`.
 
 ### Can I pass a negative amount to `increase()` or `decrease()`?
 
@@ -118,15 +113,14 @@ console.log(q3.size); // 2
 console.log([...q3].map((t) => t.id)); // [ 'a', 'twice' ]
 ```
 
-`add` returns nothing, so `size` is the only sign that a call was ignored. If a
-job can be queued more than once, give each occurrence its own object.
+If a job can be queued more than once, give each occurrence its own object.
 
 ### Can one object be in two heaps at once?
 
-Each heap keeps its own position map, so the two heaps do not corrupt each
-other's indices. What they share is the `key` field, and that is enough:
-updating the priority through one heap changes the number the other heap has
-already sorted on.
+It can, but the two heaps then disagree. Each heap keeps its own position map,
+so the two heaps do not corrupt each other's indices. What they share is the
+`key` field, and that is enough: updating the priority through one heap changes
+the number the other heap has already placed it by.
 
 ```typescript
 import { MinHeap } from 'addressable-binary-heaps';
@@ -158,14 +152,18 @@ console.log([...b].map((t) => `${t.id}:${t.key}`)); // [ 'b1:3', 'shared:1' ]
 console.log(b.peek()?.id); // b1
 ```
 
-`b` reports `b1` as its minimum while holding an element with a lower key. An
-element belongs to one heap at a time; use a second object for the second heap.
+`b` reports `b1` as its minimum while holding an element with a lower key. Keep
+an element in one heap at a time, and use a second object for the second heap.
 
-### How do I check whether an element is still in the heap?
+### Why does iterating give me the elements out of order?
 
-There is no `has`. The class API answers only indirectly. `remove`, `increase`
-and `decrease` all return `false` for an element the heap does not hold, and the
-two that would otherwise write to `key` leave it untouched:
+Because a heap is not sorted. A `MinHeap`, such as the one below, is stored as
+an array in which no element has a key greater than its children's, which
+places the smallest key at the top but leaves the rest unsorted. Every way of
+iterating it — `for...of`, `entries`, `keys` and `forEach` — walks that array
+from index `0`, and the `reversed` argument walks it from the end. Priority
+order comes from `pop`, repeated until the heap is empty, at a total cost of
+`O(n log n)`:
 
 ```typescript
 import { MinHeap } from 'addressable-binary-heaps';
@@ -177,24 +175,30 @@ class Task {
   ) {}
 }
 
-const h = new MinHeap<Task>([new Task('in', 1)]);
+const jobs = new MinHeap<Task>();
 
-const outsider = new Task('outsider', 50);
+[5, 3, 8, 1].forEach((k) => jobs.add(new Task(`t${k}`, k)));
 
-console.log(h.increase(outsider, 0)); // false
-console.log(h.increase(outsider, 10), outsider.key); // false 50
+console.log([...jobs].map((t) => t.key)); // [ 1, 3, 8, 5 ]
+console.log([...jobs[Symbol.iterator](true)].map((t) => t.key)); // [ 5, 8, 3, 1 ]
+
+const sorted: number[] = [];
+
+for (let t = jobs.pop(); t; t = jobs.pop()) {
+  sorted.push(t.key);
+}
+
+console.log(sorted); // [ 1, 3, 5, 8 ]
 ```
-
-If membership is a question you ask often, keep a `Set` alongside the heap, or
-subclass `MinHeap` and maintain one — see
-[architecture-and-api.md](architecture-and-api.md#extending).
 
 ### Can I add, pop or remove while iterating?
 
 No. The iterator walks the array by index.
 
-`add` places the new element at the end of the array and heapifies it up, which
-moves elements the walk has already passed to positions it has not reached:
+`add` places the new element at the end of the array and heapifies it up. Each
+step up swaps it with its parent, so the new element can land at an index the
+loop has already visited, and the element it displaced at one the loop has yet
+to reach:
 
 ```typescript
 import { MinHeap } from 'addressable-binary-heaps';
@@ -222,9 +226,9 @@ console.log(seen); // [ 't1', 't3', 't5', 't3' ]
 console.log([...q4].map((t) => t.id)); // [ 't0', 't1', 't5', 't3' ]
 ```
 
-`t3` is visited twice and `t0` never. Since the walk reads the length as it
-goes, a loop that adds a new element on every step never ends. `forEach` walks
-the same way.
+`t3` is visited twice and `t0` never. Since the forward walk reads the length as
+it goes, a loop that adds a new element on every step never ends. `forEach`
+walks the same way.
 
 `pop` and `remove` fill the position they empty with the last element of the
 array, unless that element is the one they take. Elements therefore shift
@@ -288,8 +292,8 @@ console.log(kept.key, q6.remove(kept)); // 2 false
 
 ### Do elements with equal keys come out in insertion order?
 
-No. Ties are broken by whatever position the rebalancing happened to leave the
-elements in:
+No. The heap compares only keys, so among equal keys the order depends on how
+earlier operations rearranged the array, not on when each element was added:
 
 ```typescript
 import { MinHeap } from 'addressable-binary-heaps';
@@ -333,43 +337,9 @@ console.log([q8.pop()?.id, q8.pop()?.id, q8.pop()?.id, q8.pop()?.id]);
 // [ 'p', 'q', 'r', 's' ]
 ```
 
-_Note:_ The factor `1e6` is a limit: with integer priorities, the order holds
-for the first million insertions, after which the counter can push a key past
-those of the next priority.
-
-### `remove()` returned `false` for something I know I added
-
-It was removed already. `pop` and `remove` both erase the element's recorded
-position, so every later call that needs that position reports failure rather
-than acting on a stale index:
-
-```typescript
-import { MinHeap } from 'addressable-binary-heaps';
-
-class Task {
-  constructor(
-    public readonly id: string,
-    public key: number
-  ) {}
-}
-
-const q9 = new MinHeap<Task>();
-
-const popped = new Task('popped', 1);
-
-q9.add(popped);
-q9.add(new Task('other', 2));
-
-q9.pop();
-
-console.log(q9.remove(popped), q9.increase(popped, 1)); // false false
-```
-
-### Does the heap copy my objects?
-
-No. It stores references and reads `key` to order them, and `increase` and
-`decrease` write to that same field on your object. Everything else is yours,
-untouched, and the object you get from `peek` or `pop` is the one you put in.
+_Note:_ The factor `1e6` is a limit: with integer priorities, the order is
+preserved for the first million insertions, after which the counter can push a
+key past those of the next priority.
 
 ### What happens with `Infinity` keys?
 
@@ -387,20 +357,20 @@ class Task {
   ) {}
 }
 
-const q10 = new MinHeap<Task>();
-q10.add(new Task('a', 5));
-q10.add(new Task('b', 3));
-q10.add(new Task('c', 8));
-q10.add(new Task('d', 1));
-q10.add(new Task('inf', Infinity));
-q10.add(new Task('neg-inf', -Infinity));
+const q9 = new MinHeap<Task>();
+q9.add(new Task('a', 5));
+q9.add(new Task('b', 3));
+q9.add(new Task('c', 8));
+q9.add(new Task('d', 1));
+q9.add(new Task('inf', Infinity));
+q9.add(new Task('neg-inf', -Infinity));
 
-console.log(q10.peek()?.id); // neg-inf
+console.log(q9.peek()?.id); // neg-inf
 
 const order: string[] = [];
 
-while (q10.size > 0) {
-  order.push((q10.pop() as Task).id);
+while (q9.size > 0) {
+  order.push((q9.pop() as Task).id);
 }
 
 console.log(order); // [ 'neg-inf', 'd', 'b', 'a', 'c', 'inf' ]
@@ -412,36 +382,35 @@ An infinite key is accepted; an infinite amount is not. `increase` and
 
 ### What happens with a `NaN` key, or one that is not a number?
 
-`key` is typed `number`, and nothing checks it at run time. The heap only ever
-applies `<`, `>`, `<=` and `>=` to keys, so a key of another type is still
+`key` is typed `number`, and nothing checks it at run time. The heap compares
+keys only with `<`, `>`, `<=` and `>=`, so a key of another type is still
 ordered, by whatever those operators do with it. They may coerce it to a number,
 compare it as text, or never return `true` at all.
 
 `NaN` passes the type check and is that last case. The rebalancing never finds
-its stop condition, so the node moves whenever it is compared with its parent or
-a child: to the root on `add`, back down a level as later insertions climb past
-it, and, on `increase` or `decrease`, down to a leaf if it has children or up to
-the root if it has none. Its position is undefined, not merely wrong. Keep keys
-to numbers other than `NaN`.
+its stop condition, so the node moves whenever it is compared with its parent
+or a child: to the root on `add`, back down a level as later insertions climb
+past it, and, on `increase` or `decrease`, down to a leaf if it has children or
+up to the root if it has none. Its position is undefined, not merely wrong.
+Keep keys to numbers other than `NaN`.
 
 ### How does a call report that it failed?
 
 Three things are checked at run time: the amount passed to `increase` and
-`decrease`, whether the initial value is an array, and whether an element passed
-to `add` or the constructor is
-[already in the heap](#can-the-same-object-be-in-the-heap-twice). The library
-defines no error of its own.
+`decrease`, whether the initial value is an array, and whether an element
+passed to `add`, `remove`, `increase`, `decrease` or the constructor is in the
+heap. The library defines no error of its own.
 
 Most calls report failure through their return value. `peek` and `pop` return
-`undefined` on an empty heap. `remove`, `increase` and `decrease` return `false`
-for an element the heap does not hold. `increase` and `decrease` also return
-`false` for an amount that is not a finite number. In every case the heap and
-`key` are left as they were.
+`undefined` on an empty heap. `remove`, `increase` and `decrease` return
+`false` for an element the heap does not hold. `increase` and `decrease` also
+return `false` for an amount that is not a finite number. In every case the
+heap and `key` are left as they were.
 
 A node whose `key` cannot be written, such as a frozen object or a class with a
-getter and no setter, satisfies `IHeapNode`. `increase` and `decrease` assign to
-`key`, so on such a node they throw the `TypeError` JavaScript raises, before
-the heap changes:
+getter and no setter, satisfies `IHeapNode`. `increase` and `decrease` assign
+to `key`, so on such a node they throw the `TypeError` JavaScript raises,
+before the heap changes:
 
 ```typescript
 import { MinHeap } from 'addressable-binary-heaps';
@@ -463,8 +432,7 @@ primitive passed to `add` or placed in the initial array, and `forEach(null)` on
 a heap that is not empty. A value passed instead of the initial array, such as a
 `Set` or a string, does not throw: it is ignored, and the heap starts empty.
 
-Some misuse is not reported at all, and leaves the heap ordered on keys that no
-longer hold:
+Some misuse is not reported at all, and leaves the heap out of order:
 [assigning `key` directly](#i-assigned-nodekey-myself-and-nothing-moved),
 [sharing one object between two heaps](#can-one-object-be-in-two-heaps-at-once)
 and [a `NaN` key](#what-happens-with-a-nan-key-or-one-that-is-not-a-number).
