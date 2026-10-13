@@ -12,6 +12,11 @@ export interface IHeapNode {
    * order as expected. Nothing validates this: a key is only ever compared
    * with `<`, `>`, `<=` and `>=`, so one of another type is ordered by
    * whatever those return for it, and a `NaN` by nothing at all.
+   *
+   * Must be writable for a node passed to `increase` or `decrease`, which
+   * assign to it. TypeScript accepts a `readonly` key here, so a frozen node or
+   * a getter without a setter type-checks, and those calls then throw a
+   * `TypeError`.
    */
   key: number;
 }

@@ -5,9 +5,9 @@
 
 Min-heaps and max-heaps for TypeScript in which **your object is the element**.
 The heap keeps track of every element's position, so raising or lowering an
-element's priority, or taking it out of the queue entirely, never begins with a
-search for it, whether you use the classes or the plain functions they are
-built on.
+element's priority, or taking it out of the heap entirely, never begins with a
+search for it, whether you use the classes or the plain functions they are built
+on.
 
 ## Install
 
@@ -42,26 +42,26 @@ const lint = new Task('lint', 8);
 const queue = new MinHeap<Task>([compile, deploy, lint]);
 
 queue.add(new Task('test', 1));
+
 console.log(queue.size, queue.peek()?.id); // 4 test
 
 // Reprioritising takes the object itself — no index, no handle to keep.
 queue.decrease(deploy, 5);
+
 console.log(queue.peek()?.id, deploy.key); // deploy 0
 
 // So does cancelling. `remove` reports whether the element was there.
 console.log(queue.remove(lint), queue.size); // true 3
 console.log(queue.remove(lint)); // false
 
-console.log(queue.pop()?.id, queue.pop()?.id, queue.pop()?.id);
-// deploy test compile
+console.log(queue.pop()?.id, queue.pop()?.id, queue.pop()?.id); // deploy test compile
 ```
 
 ## Reaching an element that is already in the heap
 
 `increase` and `decrease` take the element rather than a position, adjust `key`,
-and restore the heap property from wherever that element happens to be sitting —
-in whichever direction the new key requires. `MaxHeap` is the same structure
-with the comparison reversed:
+and move the element up or down to wherever its new key places it. `MaxHeap` is
+the same structure with the comparison reversed:
 
 ```typescript
 import { MaxHeap } from 'addressable-binary-heaps';
@@ -78,8 +78,9 @@ const alerts = new MaxHeap([
 
 console.log(alerts.peek()?.name); // network
 
-// The lowest element becomes the highest, without being removed and re-added.
+// `disk`, the lowest key, moves to the top without being removed and re-added.
 alerts.increase(disk, 10);
+
 console.log(alerts.peek()?.name, disk.key); // disk 12
 
 // Iteration follows the underlying array, not priority order.
@@ -89,37 +90,49 @@ console.log([...alerts.keys()]); // [ 12, 9, 4, 7, 5 ]
 console.log(alerts.pop()?.name, alerts.pop()?.name); // disk network
 ```
 
-Both operations reach the element through a `WeakMap` from element to array
-index, which the heap maintains through every swap. A heap without that map has
-to scan its array before it can act on a given element, and an array kept sorted
-has to shift everything past the position that changed. The gap between those
-two and this heap grows with the size of the structure.
+Neither operation searches for the element: the heap keeps an index map, from
+each element to its position, and updates it on every move. A heap without that
+map has to scan its array before it can act on a given element, and an array
+kept sorted has to shift everything past the position that changed. The gap
+between those two and this heap grows with the size of the structure.
+[The architecture write-up](https://github.com/styiannis/addressable-binary-heaps/blob/main/docs/architecture-and-api.md#what-the-addressing-costs)
+compares all three, and gives what the map itself costs.
 
 ## The same heaps as plain functions
 
-The classes delegate to a layer of plain functions over a plain array, and that
-layer is exported as `minHeap` and `maxHeap`. A heap built by it is an ordinary
-`Array` carrying an `indices` property, so everything `Array` offers still works
-on it:
+The classes delegate to a layer of functions, exported as `minHeap` and
+`maxHeap`. Use it when you want no class instance per heap, or when you want to
+read the array itself. The heap these functions build is an ordinary `Array`
+with an extra `indices` property, so methods that only read it, such as `map`
+below, work as usual. Methods that write to it, such as `push` or `sort`, leave
+the index map out of step with the array and break the heap.
 
 ```typescript
-import { minHeap, IHeapArray, IHeapNode } from 'addressable-binary-heaps';
+import {
+  minHeap,
+  type IHeapArray,
+  type IHeapNode,
+} from 'addressable-binary-heaps';
 
 interface Entry extends IHeapNode {
   path: string;
 }
 
+const icon: Entry = { path: 'c.png', key: 7 };
+
 const heap = minHeap.create<IHeapArray<Entry>>([
   { path: 'b.png', key: 40 },
   { path: 'a.png', key: 12 },
-  { path: 'c.png', key: 7 },
+  icon,
 ]);
 
 console.log(minHeap.size(heap), heap.length); // 3 3
 console.log(minHeap.peek(heap)?.path); // c.png
 console.log(heap.map((e) => e.path)); // [ 'c.png', 'a.png', 'b.png' ]
 
-console.log(minHeap.pop(heap)?.path, minHeap.size(heap)); // c.png 2
+// The functions take the element too.
+console.log(minHeap.increase(heap, icon, 50), minHeap.peek(heap)?.path); // true a.png
+console.log(minHeap.remove(heap, icon), minHeap.size(heap)); // true 2
 ```
 
 ## Importing
@@ -151,6 +164,9 @@ const high = maxHeap.create([{ key: 3 }, { key: 1 }]);
 console.log(minHeap.peek(low)?.key, maxHeap.peek(high)?.key); // 1 3
 ```
 
+TypeScript resolves the subpaths under `moduleResolution` `node16`, `nodenext`
+or `bundler`; under `node10`, import from the root.
+
 ## API
 
 `MinHeap<N>` and `MaxHeap<N>` expose the same members. Both extend
@@ -158,14 +174,14 @@ console.log(minHeap.peek(low)?.key, maxHeap.peek(high)?.key); // 1 3
 in for either. Every member but `forEach` and `[Symbol.iterator]` has a
 functional counterpart, shown here for `minHeap` and identical for `maxHeap`:
 
-| Class member                   | Function                            | Cost                        |
+| Class member                   | Function                            | Time complexity             |
 | ------------------------------ | ----------------------------------- | --------------------------- |
 | `new MinHeap(initial?)`        | `minHeap.create(initial?)`          | `O(n)`                      |
 | `size`                         | `minHeap.size(h)`                   | `O(1)`                      |
-| `add(node)`                    | `minHeap.add(h, node)`              | `O(log n)`                  |
+| `add(node)`                    | `minHeap.add(h, node)`              | `O(log n)` amortized        |
 | `peek()`                       | `minHeap.peek(h)`                   | `O(1)`                      |
-| `pop()`                        | `minHeap.pop(h)`                    | `O(log n)`                  |
-| `remove(node)`                 | `minHeap.remove(h, node)`           | `O(log n)`                  |
+| `pop()`                        | `minHeap.pop(h)`                    | `O(log n)` amortized        |
+| `remove(node)`                 | `minHeap.remove(h, node)`           | `O(log n)` amortized        |
 | `increase(node, amount)`       | `minHeap.increase(h, node, amount)` | `O(log n)`                  |
 | `decrease(node, amount)`       | `minHeap.decrease(h, node, amount)` | `O(log n)`                  |
 | `clear()`                      | `minHeap.clear(h)`                  | `O(n)`                      |
@@ -174,30 +190,35 @@ functional counterpart, shown here for `minHeap` and identical for `maxHeap`:
 | `forEach(callback, thisArg?)`  | —                                   | `O(n)`                      |
 | `[Symbol.iterator](reversed?)` | —                                   | `O(1)` call, `O(n)` drained |
 
-The three generators cost nothing until something consumes them; `forEach`
-walks the array on the call. All four follow the underlying array rather than
-priority order.
+The three generators walk the array only as they are consumed; `forEach` walks
+all of it on the call. All four follow the underlying array rather than priority
+order.
 
-Nothing in the library throws. A call that cannot find its element returns
-`false`, and `peek` or `pop` on an empty heap returns `undefined`.
+A call that cannot find its element returns `false`, as do `increase` and
+`decrease` when the amount is not a number or would leave the key `NaN`. `peek`
+or `pop` on an empty heap returns `undefined`. `add` ignores an element the heap
+already holds.
 
 ## When not to use it
 
-Addressing is not free: it costs memory for every element held and time on
-every insertion. What follows are the cases where nothing is bought with it.
+Addressing requires memory for every element held, and time whenever an element
+enters, moves or leaves. The cases below gain nothing from it.
 
-| If this describes the problem                      | Reach for                                                                                                                                      |
-| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Only `add` and `pop`; priorities never move        | a binary heap without addressing — the index map would be paid for and never used                                                              |
-| The whole order, once, over a set already complete | `Array.prototype.sort`, which is both faster here and the shorter program                                                                      |
-| Ordering by something other than a number          | a heap that takes a comparator — `key` is typed `number` and compared with `<`, `>`, `<=` and `>=`, and there is no comparator parameter       |
-| Frequent membership tests                          | a `Set` maintained beside the heap — there is no `has`, and a `false` from `remove`, `increase` or `decrease` is the only signal the API gives |
-| One element queued in two structures at once       | a separate object per structure — `increase` and `decrease` write to `node.key`, and the other heap is never told it changed                   |
+| If this describes the problem                      | Reach for                                                                                                                                                                                                                                                      |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Only `add` and `pop`; priorities never move        | a binary heap without addressing — the index map would be maintained, and read only to reject a repeated `add`                                                                                                                                                 |
+| The whole order, once, over a set already complete | `Array.prototype.sort`, which reaches the same order without a structure to maintain, in a shorter program                                                                                                                                                     |
+| Ordering by something other than a number          | a heap that takes a comparator — `key` is typed `number` and compared with `<`, `>`, `<=` and `>=`, and there is no comparator parameter                                                                                                                       |
+| Frequent membership tests                          | [a `Set` maintained beside the heap](https://github.com/styiannis/addressable-binary-heaps/blob/main/docs/architecture-and-api.md#extending) — there is no `has`, and a `false` from `remove`, `increase` or `decrease` is the only signal the class API gives |
+| One element queued in two structures at once       | a separate object per structure — `increase` and `decrease` write to `node.key`, and the other heap is never told it changed                                                                                                                                   |
 
 ## Documentation
 
-- [The generated API reference](https://styiannis.github.io/addressable-binary-heaps/) —
-  every signature and every type.
+- [Guides, the FAQ and the architecture write-up](https://github.com/styiannis/addressable-binary-heaps/tree/main/docs)
+  — getting a heap running, the behaviour that surprises people, and how the
+  library is built, including what the addressing costs.
+- [The generated API reference](https://styiannis.github.io/addressable-binary-heaps/)
+  — every signature and every type.
 - [Open an issue](https://github.com/styiannis/addressable-binary-heaps/issues)
   for a question or a bug report.
 

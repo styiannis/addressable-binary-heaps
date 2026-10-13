@@ -4,7 +4,8 @@ import { IHeapArray } from '../types';
  * Populates a heap instance from an array of nodes using Floyd's bottom-up
  * heapify: fills the array and index map in one pass, then heapifies down
  * from the last parent to the root. Runs in `O(n)`, versus the `O(n log n)` of
- * inserting the same nodes one at a time.
+ * inserting the same nodes one at a time. A node that appears more than once is
+ * placed at its first occurrence only.
  *
  * @typeParam H - The type of heap array.
  * @param instance - The empty heap instance to populate.
@@ -16,10 +17,14 @@ export function buildHeap<H extends IHeapArray = IHeapArray>(
   initialNodes: H[number][] | Readonly<H[number][]>,
   heapifyDown: (instance: H, index: number) => void
 ) {
-  for (const [i, node] of initialNodes.entries()) {
-    instance.indices.set(node, i);
+  initialNodes.forEach((node) => {
+    if (instance.indices.has(node)) {
+      return;
+    }
+
+    instance.indices.set(node, instance.length);
     instance.push(node);
-  }
+  });
 
   for (let i = Math.floor(instance.length / 2) - 1; i >= 0; i--) {
     heapifyDown(instance, i);
