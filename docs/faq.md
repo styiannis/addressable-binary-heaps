@@ -376,9 +376,10 @@ while (q9.size > 0) {
 console.log(order); // [ 'neg-inf', 'd', 'b', 'a', 'c', 'inf' ]
 ```
 
-An infinite key is accepted; an infinite amount is not. `increase` and
-`decrease` return `false` for an amount that is not a finite number, because
-`Infinity` followed by `-Infinity` would leave the key `NaN`.
+An infinite amount is accepted as well, unless the new key would be `NaN`.
+Adding `Infinity` to `-Infinity`, or subtracting it from `Infinity`, gives
+`NaN`, so `increase` and `decrease` return `false` for either and leave the key
+as it was.
 
 ### What happens with a `NaN` key, or one that is not a number?
 
@@ -389,23 +390,23 @@ compare it as text, or never return `true` at all.
 
 `NaN` passes the type check and is that last case. The rebalancing never finds
 its stop condition, so the node moves whenever it is compared with its parent
-or a child: to the root on `add`, back down a level as later insertions climb
-past it, and, on `increase` or `decrease`, down to a leaf if it has children or
-up to the root if it has none. Its position is undefined, not merely wrong.
-Keep keys to numbers other than `NaN`.
+or a child: to the root on `add`, and back down a level as later insertions
+climb past it. Its position is undefined, not merely wrong. `increase` and
+`decrease` return `false` for it rather than move it, since any amount leaves
+the key `NaN`. Keep keys to numbers other than `NaN`.
 
 ### How does a call report that it failed?
 
 Three things are checked at run time: the amount passed to `increase` and
-`decrease`, whether the initial value is an array, and whether an element
-passed to `add`, `remove`, `increase`, `decrease` or the constructor is in the
-heap. The library defines no error of its own.
+`decrease` and the key it produces, whether the initial value is an array, and
+whether an element passed to `add`, `remove`, `increase`, `decrease` or the
+constructor is in the heap. The library defines no error of its own.
 
 Most calls report failure through their return value. `peek` and `pop` return
 `undefined` on an empty heap. `remove`, `increase` and `decrease` return
 `false` for an element the heap does not hold. `increase` and `decrease` also
-return `false` for an amount that is not a finite number. In every case the
-heap and `key` are left as they were.
+return `false` for an amount that is not a number, or one that would leave the
+key `NaN`. In every case the heap and `key` are left as they were.
 
 A node whose `key` cannot be written, such as a frozen object or a class with a
 getter and no setter, satisfies `IHeapNode`. `increase` and `decrease` assign

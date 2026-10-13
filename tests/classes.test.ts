@@ -288,7 +288,7 @@ describe('Classes', () => {
     ['MaxHeap' as const, MaxHeap],
     ['MinHeap' as const, MinHeap],
   ])(
-    '[%s] Increase and decrease reject an amount that is not a finite number',
+    '[%s] Increase and decrease reject an amount that is not a number',
     (classInstanceType, Heap) => {
       const instanceType = toCoreInstanceType(classInstanceType);
       const nodes = [1, 2, 3, 4, 5].map((key) => ({ key }));
@@ -298,14 +298,92 @@ describe('Classes', () => {
       expect(node).not.toBeUndefined();
 
       if (node) {
-        [NaN, Infinity, -Infinity, '5' as unknown as number].forEach(
-          (amount) => {
-            expect(instance.increase(node, amount)).toBe(false);
-            expect(instance.decrease(node, amount)).toBe(false);
-          }
-        );
+        [NaN, '5' as unknown as number].forEach((amount) => {
+          expect(instance.increase(node, amount)).toBe(false);
+          expect(instance.decrease(node, amount)).toBe(false);
+        });
 
         expect(node.key).toBe(2);
+        expect(isValidHeap(instanceType, [...instance])).toBe(true);
+      }
+    }
+  );
+
+  it.each([
+    ['MaxHeap' as const, MaxHeap],
+    ['MinHeap' as const, MinHeap],
+  ])(
+    '[%s] Increase and decrease reject an amount that would leave the key NaN',
+    (classInstanceType, Heap) => {
+      const instanceType = toCoreInstanceType(classInstanceType);
+      const nodes = [1, 2, Infinity, -Infinity].map((key) => ({ key }));
+      const instance = new Heap(nodes);
+      const [, , inf, negInf] = nodes;
+
+      expect(inf).not.toBeUndefined();
+      expect(negInf).not.toBeUndefined();
+
+      if (inf && negInf) {
+        expect(instance.increase(inf, -Infinity)).toBe(false);
+        expect(instance.decrease(inf, Infinity)).toBe(false);
+        expect(instance.increase(negInf, Infinity)).toBe(false);
+        expect(instance.decrease(negInf, -Infinity)).toBe(false);
+
+        expect(inf.key).toBe(Infinity);
+        expect(negInf.key).toBe(-Infinity);
+        expect(isValidHeap(instanceType, [...instance])).toBe(true);
+      }
+    }
+  );
+
+  it.each([
+    ['MaxHeap' as const, MaxHeap],
+    ['MinHeap' as const, MinHeap],
+  ])(
+    '[%s] Increase and decrease reject a new key that is NaN or not a number',
+    (classInstanceType, Heap) => {
+      const nodes = [1, 2, 3].map((key) => ({ key }));
+      const instance = new Heap(nodes);
+      const node = nodes[1];
+
+      expect(node).not.toBeUndefined();
+
+      if (node) {
+        node.key = NaN;
+
+        expect(instance.increase(node, 1)).toBe(false);
+        expect(instance.decrease(node, 1)).toBe(false);
+        expect(node.key).toBeNaN();
+
+        const text = { key: '3' as unknown as number };
+        instance.add(text);
+
+        expect(instance.increase(text, 5)).toBe(false);
+        expect(text.key).toBe('3');
+      }
+    }
+  );
+
+  it.each([
+    ['MaxHeap' as const, MaxHeap],
+    ['MinHeap' as const, MinHeap],
+  ])(
+    '[%s] Increase and decrease accept an infinite amount',
+    (classInstanceType, Heap) => {
+      const instanceType = toCoreInstanceType(classInstanceType);
+      const nodes = [1, 2, 3, 4, 5].map((key) => ({ key }));
+      const instance = new Heap(nodes);
+      const [first, second] = nodes;
+
+      expect(first).not.toBeUndefined();
+      expect(second).not.toBeUndefined();
+
+      if (first && second) {
+        expect(instance.increase(first, Infinity)).toBe(true);
+        expect(instance.decrease(second, Infinity)).toBe(true);
+
+        expect(first.key).toBe(Infinity);
+        expect(second.key).toBe(-Infinity);
         expect(isValidHeap(instanceType, [...instance])).toBe(true);
       }
     }

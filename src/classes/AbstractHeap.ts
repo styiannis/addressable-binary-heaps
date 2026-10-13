@@ -46,8 +46,8 @@ export abstract class AbstractHeap<N extends IHeapNode = IHeapNode> {
    * @param node - The element to modify.
    * @param decreaseValue - Amount to decrease the key by.
    * @returns `true` if element was found and modified,
-   *          `false` if the heap does not hold it or the amount is not a
-   *          finite number (`key` is then unchanged).
+   *          `false` if the heap does not hold it, the amount is not a
+   *          number, or the new key would be `NaN` (`key` is then unchanged).
    * @throws `TypeError` if `node.key` is not writable, as on a frozen node
    *         or a `key` with a getter and no setter. The heap and `key` are
    *         then unchanged.
@@ -88,8 +88,8 @@ export abstract class AbstractHeap<N extends IHeapNode = IHeapNode> {
    * @param node - The element to modify.
    * @param increaseValue - Amount to increase the key by.
    * @returns `true` if element was found and modified,
-   *          `false` if the heap does not hold it or the amount is not a
-   *          finite number (`key` is then unchanged).
+   *          `false` if the heap does not hold it, the amount is not a
+   *          number, or the new key would be `NaN` (`key` is then unchanged).
    * @throws `TypeError` if `node.key` is not writable, as on a frozen node
    *         or a `key` with a getter and no setter. The heap and `key` are
    *         then unchanged.

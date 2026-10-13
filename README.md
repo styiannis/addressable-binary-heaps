@@ -192,8 +192,9 @@ all of it on the call. All four follow the underlying array rather than priority
 order.
 
 A call that cannot find its element returns `false`, as do `increase` and
-`decrease` when the amount is not a finite number. `peek` or `pop` on an empty
-heap returns `undefined`. `add` ignores an element the heap already holds.
+`decrease` when the amount is not a number or would leave the key `NaN`. `peek`
+or `pop` on an empty heap returns `undefined`. `add` ignores an element the heap
+already holds.
 
 ## When not to use it
 

@@ -120,8 +120,8 @@ console.log(queue.decrease(new Task('stranger', 0), 1)); // false
 move the element in whichever direction its new key belongs. Both take the
 element, not an index or a handle, and both return `false` if the heap does not
 hold it, as the last call above shows for an element that was never added. They
-also return `false`, and leave `key` unchanged, when the amount is not a finite
-number.
+also return `false`, and leave `key` unchanged, when the amount is not a number
+or the new key would be `NaN`.
 
 ## Cancel an element from anywhere
 
