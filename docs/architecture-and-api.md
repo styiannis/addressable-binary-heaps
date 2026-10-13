@@ -117,18 +117,26 @@ minus `create`, which the constructor replaces, plus `forEach` and
 
 ## Complexity, as implemented
 
-| Operation              | Cost                                      |
-| ---------------------- | ----------------------------------------- |
-| `size` `peek`          | `O(1)`                                    |
-| `add`                  | `O(log n)`                                |
-| `pop`                  | `O(log n)`                                |
-| `remove`               | `O(log n)`                                |
-| `increase` `decrease`  | `O(log n)`                                |
-| `clear`                | `O(n)`                                    |
-| `entries` `keys`       | `O(1)` call, `O(n)` drained, `O(1)` space |
-| `forEach`              | `O(n)`                                    |
-| `create()`             | `O(1)`                                    |
-| `create(initialNodes)` | `O(n)`                                    |
+| Operation              | Time complexity             |
+| ---------------------- | --------------------------- |
+| `size` `peek`          | `O(1)`                      |
+| `add`                  | `O(log n)` amortized        |
+| `pop`                  | `O(log n)` amortized        |
+| `remove`               | `O(log n)` amortized        |
+| `increase` `decrease`  | `O(log n)`                  |
+| `clear`                | `O(n)`                      |
+| `entries` `keys`       | `O(1)` call, `O(n)` drained |
+| `forEach`              | `O(n)`                      |
+| `create()`             | `O(1)`                      |
+| `create(initialNodes)` | `O(n)`                      |
+
+`add`, `pop` and `remove` are amortized: their time averages `O(log n)` over a
+sequence of calls, but a single call can take `O(n)`. Each makes at most
+`log n` swaps. The array and the index map, though, reallocate their storage
+as the heap grows, and, in V8, the index map does so as it shrinks as well,
+copying every entry in that one call. The sizes at which that happens are
+spaced geometrically, so the copying adds constant time to each call on
+average.
 
 `create` without `initialNodes` returns an empty heap in `O(1)`. With
 `initialNodes`, it builds the heap in `O(n)` using Floyd's bottom-up heapify:
@@ -146,9 +154,9 @@ pops it. The element moved into its place is then heapified in both directions,
 but at most one of the two calls moves anything, so the cost stays `O(log n)`.
 
 `entries` and `keys` are generators. Calling one costs `O(1)`, and the `O(n)` is
-paid as it is drained. Both walk the underlying array, not priority order.
-Priority order costs `O(n log n)` through repeated `pop`, which empties the heap
-along the way.
+paid as it is drained. Both walk the underlying array without copying it, and
+follow its order, not priority order. Priority order costs `O(n log n)` through
+repeated `pop`, which empties the heap along the way.
 
 ## Extending
 

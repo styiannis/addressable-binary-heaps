@@ -42,18 +42,19 @@ const lint = new Task('lint', 8);
 const queue = new MinHeap<Task>([compile, deploy, lint]);
 
 queue.add(new Task('test', 1));
+
 console.log(queue.size, queue.peek()?.id); // 4 test
 
 // Reprioritising takes the object itself — no index, no handle to keep.
 queue.decrease(deploy, 5);
+
 console.log(queue.peek()?.id, deploy.key); // deploy 0
 
 // So does cancelling. `remove` reports whether the element was there.
 console.log(queue.remove(lint), queue.size); // true 3
 console.log(queue.remove(lint)); // false
 
-console.log(queue.pop()?.id, queue.pop()?.id, queue.pop()?.id);
-// deploy test compile
+console.log(queue.pop()?.id, queue.pop()?.id, queue.pop()?.id); // deploy test compile
 ```
 
 ## Reaching an element that is already in the heap
@@ -79,6 +80,7 @@ console.log(alerts.peek()?.name); // network
 
 // `disk`, the lowest key, moves to the top without being removed and re-added.
 alerts.increase(disk, 10);
+
 console.log(alerts.peek()?.name, disk.key); // disk 12
 
 // Iteration follows the underlying array, not priority order.
@@ -98,11 +100,12 @@ compares all three, and gives what the map itself costs.
 
 ## The same heaps as plain functions
 
-The classes delegate to a layer of plain functions over a plain array, and that
-layer is exported as `minHeap` and `maxHeap`. A heap built by it is an ordinary
-`Array` carrying an `indices` property. `Array` methods that read it work as
-usual, as `map` does below; methods that write to it, such as `push` or `sort`,
-bypass the index map and break the heap.
+The classes delegate to a layer of functions, exported as `minHeap` and
+`maxHeap`. Use it when you want no class instance per heap, or when you want to
+read the array itself. The heap these functions build is an ordinary `Array`
+with an extra `indices` property, so methods that only read it, such as `map`
+below, work as usual. Methods that write to it, such as `push` or `sort`, leave
+the index map out of step with the array and break the heap.
 
 ```typescript
 import {
@@ -171,14 +174,14 @@ or `bundler`; under `node10`, import from the root.
 in for either. Every member but `forEach` and `[Symbol.iterator]` has a
 functional counterpart, shown here for `minHeap` and identical for `maxHeap`:
 
-| Class member                   | Function                            | Cost                        |
+| Class member                   | Function                            | Time complexity             |
 | ------------------------------ | ----------------------------------- | --------------------------- |
 | `new MinHeap(initial?)`        | `minHeap.create(initial?)`          | `O(n)`                      |
 | `size`                         | `minHeap.size(h)`                   | `O(1)`                      |
-| `add(node)`                    | `minHeap.add(h, node)`              | `O(log n)`                  |
+| `add(node)`                    | `minHeap.add(h, node)`              | `O(log n)` amortized        |
 | `peek()`                       | `minHeap.peek(h)`                   | `O(1)`                      |
-| `pop()`                        | `minHeap.pop(h)`                    | `O(log n)`                  |
-| `remove(node)`                 | `minHeap.remove(h, node)`           | `O(log n)`                  |
+| `pop()`                        | `minHeap.pop(h)`                    | `O(log n)` amortized        |
+| `remove(node)`                 | `minHeap.remove(h, node)`           | `O(log n)` amortized        |
 | `increase(node, amount)`       | `minHeap.increase(h, node, amount)` | `O(log n)`                  |
 | `decrease(node, amount)`       | `minHeap.decrease(h, node, amount)` | `O(log n)`                  |
 | `clear()`                      | `minHeap.clear(h)`                  | `O(n)`                      |
