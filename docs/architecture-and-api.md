@@ -163,10 +163,9 @@ repeated `pop`, which empties the heap along the way.
 Three routes, for three different intentions.
 
 **Subclass a concrete class** when the structure is right and the API is missing
-something. A membership test is one such addition, and one a subclass cannot
-answer from the heap itself. The index map sits behind the `#heap` private
-field, so membership has to be tracked in a `Set` maintained beside the heap
-rather than read out of it:
+something. A membership test is one such addition. The index map sits behind
+the `#heap` private field, so a subclass cannot read it, and tracks membership
+in a `Set` maintained beside the heap instead:
 
 ```typescript
 import { MinHeap, type IHeapNode } from 'addressable-binary-heaps';

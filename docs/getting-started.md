@@ -53,7 +53,7 @@ reversed.
 ## Take from the top
 
 `peek` reads the top without disturbing it, and `pop` removes and returns it.
-Both return `undefined` on an empty heap rather than throwing.
+Both return `undefined` on an empty heap.
 
 ```typescript
 import { MinHeap } from 'addressable-binary-heaps';
@@ -75,9 +75,9 @@ console.log(drained.pop()?.id, drained.pop()?.id, drained.pop()?.id); // a b c
 console.log(drained.pop(), drained.peek(), drained.size); // undefined undefined 0
 ```
 
-The constructor takes an optional array of elements and builds the heap from it
-in `O(n)`. The order they arrive in does not matter; they leave through `pop`
-in priority order.
+The constructor takes an optional array of elements and builds the heap from
+it. The order they arrive in does not matter; they leave through `pop` in
+priority order.
 
 ## Change a priority while the element is queued
 
@@ -125,8 +125,9 @@ or the new key would be `NaN`.
 
 ## Cancel an element from anywhere
 
-`remove` is the same addressing applied to deletion. It takes the element and
-reports whether it was there:
+Like `increase` and `decrease`, `remove` takes the element itself, so it can
+delete it from any position, not only from the top as `pop` does. It reports
+whether the element was there:
 
 ```typescript
 import { MinHeap } from 'addressable-binary-heaps';
@@ -154,10 +155,8 @@ element you are not sure is still queued.
 
 ## Iterate, knowing what the order is
 
-A heap is iterable, and the order it iterates in is not necessarily the order
-elements leave it in. A `MinHeap`, such as the one below, is stored as an array
-in which no element has a key greater than its children's. That is weaker than
-sorted: it places the smallest key at the top but leaves the rest unsorted.
+Iterating a heap walks the array it is stored in, and that array is not sorted
+([the FAQ explains why](faq.md#why-does-iterating-give-me-the-elements-out-of-order)).
 
 ```typescript
 import { MinHeap } from 'addressable-binary-heaps';
@@ -177,11 +176,11 @@ console.log([...jobs].map((t) => t.key)); // [ 1, 3, 8, 5 ]
 console.log([...jobs[Symbol.iterator](true)].map((t) => t.key)); // [ 5, 8, 3, 1 ]
 ```
 
-The argument reverses the array, not the priority. `for...of` and the spread
-form call the iterator with no argument, so pass it explicitly when you want the
-other direction, as the second line does. `entries(reversed?)`,
-`keys(reversed?)` and `forEach(callback, thisArg?)` walk the same array in the
-same order.
+The argument walks the same array from the end, which is not priority order
+reversed. `for...of` and the spread form call the iterator with no argument, so
+pass it explicitly when you want the other direction, as the second line does.
+`entries(reversed?)`, `keys(reversed?)` and `forEach(callback, thisArg?)` walk
+the same array in the same order.
 
 Sorted output comes from draining:
 
@@ -271,9 +270,9 @@ console.log(heap.length, heap.indices.get(small)); // 3 2
 Every class method except `forEach` and `[Symbol.iterator]` has a function of
 the same name whose first argument is the heap, and `create` replaces the
 constructor. The heap itself is an ordinary `Array` carrying one extra property,
-`indices`, which is the element-to-position map the addressing is built on —
-readable here, private behind the classes. `maxHeap` is the same set of
-functions with the comparison reversed.
+`indices`, the index map from each element to its position, which the addressing
+is built on — readable here, private behind the classes. `maxHeap` is the same
+set of functions with the comparison reversed.
 
 ## What this page did not cover
 

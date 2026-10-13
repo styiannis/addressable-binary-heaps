@@ -9,7 +9,7 @@ the questions the package shape raises.
 
 ### Does the heap copy my objects?
 
-No. It stores references and reads `key` to order them, and `increase` and
+No. It stores references, it reads `key` to order them, and `increase` and
 `decrease` write to that same field on your object. Everything else is yours,
 untouched, and the object you get from `peek` or `pop` is the one you put in.
 
@@ -117,7 +117,7 @@ If a job can be queued more than once, give each occurrence its own object.
 
 ### Can one object be in two heaps at once?
 
-It can, but the two heaps then disagree. Each heap keeps its own position map,
+It can, but the two heaps then disagree. Each heap keeps its own index map,
 so the two heaps do not corrupt each other's indices. What they share is the
 `key` field, and that is enough: updating the priority through one heap changes
 the number the other heap has already placed it by.
@@ -162,8 +162,7 @@ an array in which no element has a key greater than its children's, which
 places the smallest key at the top but leaves the rest unsorted. Every way of
 iterating it — `for...of`, `entries`, `keys` and `forEach` — walks that array
 from index `0`, and the `reversed` argument walks it from the end. Priority
-order comes from `pop`, repeated until the heap is empty, at a total cost of
-`O(n log n)`:
+order comes from `pop`, repeated until the heap is empty:
 
 ```typescript
 import { MinHeap } from 'addressable-binary-heaps';
@@ -196,9 +195,10 @@ console.log(sorted); // [ 1, 3, 5, 8 ]
 No. The iterator walks the array by index.
 
 `add` places the new element at the end of the array and heapifies it up. Each
-step up swaps it with its parent, so the new element can land at an index the
-loop has already visited, and the element it displaced at one the loop has yet
-to reach:
+step up swaps the new element with its parent. The new element moves to a lower
+index, which the loop may already have passed, so it can be skipped. The parent
+moves to a higher index, which the loop may not have reached yet, so it can be
+visited twice:
 
 ```typescript
 import { MinHeap } from 'addressable-binary-heaps';
@@ -383,17 +383,22 @@ as it was.
 
 ### What happens with a `NaN` key, or one that is not a number?
 
-`key` is typed `number`, and nothing checks it at run time. The heap compares
-keys only with `<`, `>`, `<=` and `>=`, so a key of another type is still
-ordered, by whatever those operators do with it. They may coerce it to a number,
-compare it as text, or never return `true` at all.
+`key` is typed `number`, but nothing checks it at run time. The heap only
+compares keys, with `<`, `>`, `<=` and `>=`, so whatever those operators do
+with a key decides where it goes. A key of another type is still compared.
+Depending on its type, the operators convert it to a number, compare it as
+text, return `false` for every comparison, or throw, as a `Symbol` key does.
 
-`NaN` passes the type check and is that last case. The rebalancing never finds
-its stop condition, so the node moves whenever it is compared with its parent
-or a child: to the root on `add`, and back down a level as later insertions
-climb past it. Its position is undefined, not merely wrong. `increase` and
-`decrease` return `false` for it rather than move it, since any amount leaves
-the key `NaN`. Keep keys to numbers other than `NaN`.
+`NaN` is a `number`, so TypeScript accepts it, and every comparison with it
+returns `false`. The heap stops moving an element when a comparison shows it is
+in place, and with `NaN` none ever does. A `NaN` element therefore moves
+whenever it is compared: `add` takes it to the root, and each later `add` that
+climbs past it pushes it a level down. Where it sits depends on the sequence of
+calls, not on its key.
+
+`increase` and `decrease` cannot repair it. Any amount added to `NaN` gives
+`NaN`, so both return `false` and leave the element where it is. Keep keys to
+numbers other than `NaN`.
 
 ### How does a call report that it failed?
 
@@ -444,7 +449,7 @@ and [a `NaN` key](#what-happens-with-a-nan-key-or-one-that-is-not-a-number).
 
 Yes. `src/` references no platform API — no `process`, no `document`, no
 `Buffer`, no timers — so the built modules run unmodified in browsers, Node,
-Deno, Bun, workers and edge runtimes. There is nothing to polyfill.
+Bun, workers and edge runtimes. There is nothing to polyfill.
 
 ### ESM or CommonJS?
 
